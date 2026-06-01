@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/ui/Navbar";
 import BorsaTicker from "@/components/ui/BorsaTicker";
 import FilterPanel, { type Filters } from "@/components/ui/FilterPanel";
@@ -11,75 +12,26 @@ import AdminLeadPanel from "@/components/ui/AdminLeadPanel";
 import type { Car, LeadBuying, LeadStatus } from "@/types";
 
 /* ======================================================================== */
-/*  MOCK VERİ                                                               */
-/* ======================================================================== */
-
-const mockCars: Car[] = [
-  {
-    id: "SNC-001", brand: "Renault", model: "Clio 4 Joy 1.2", year: 2016, km: 142_000,
-    price: 495_000, images: [], segment: "Kelepir", status: "Aktif",
-    esnaf_notu: "Sağ arka çamurluk boyalı, mekanik yüzde yüz. Piyasanın 80 bin altında, kaçmaz.",
-    ekspertiz_durumu: "Ekspertizli", fuel_type: "Benzin", transmission: "Manuel", created_at: "2025-01-10",
-  },
-  {
-    id: "SNC-002", brand: "Volkswagen", model: "Passat Highline 1.4 TSI", year: 2020, km: 68_000,
-    price: 1_425_000, images: [], segment: "Orta Direk", status: "Aktif",
-    esnaf_notu: "2 el, boyasız diye alındı ama kaputta minik bir taş izi var.",
-    ekspertiz_durumu: "Ekspertizli", fuel_type: "Benzin", transmission: "Otomatik", created_at: "2025-01-12",
-  },
-  {
-    id: "SNC-003", brand: "BMW", model: "3.20i M Sport G20", year: 2022, km: 22_000,
-    price: 2_850_000, images: [], segment: "Premium", status: "Aktif",
-    esnaf_notu: "Sıfır ayarında, hatasız, full donanım.",
-    ekspertiz_durumu: "Ekspertizli", fuel_type: "Benzin", transmission: "Otomatik", created_at: "2025-01-15",
-  },
-  {
-    id: "SNC-004", brand: "Fiat", model: "Doblo 1.3 Multijet", year: 2012, km: 340_000,
-    price: 275_000, images: [], segment: "Yayla Kan", status: "Aktif",
-    esnaf_notu: "5 değişen var, motor açılmadı, turbo yeni.",
-    ekspertiz_durumu: "Ekspertizli", fuel_type: "Dizel", transmission: "Manuel", created_at: "2025-01-08",
-  },
-  {
-    id: "SNC-005", brand: "Mercedes-Benz", model: "E 200 AMG", year: 2023, km: 9_500,
-    price: 4_650_000, images: [], segment: "Premium", status: "Satıldı",
-    esnaf_notu: "İlk sahibinden, garantili, dokunulmamış.",
-    ekspertiz_durumu: "Ekspertizli", fuel_type: "Benzin", transmission: "Otomatik", created_at: "2025-01-05",
-  },
-  {
-    id: "SNC-006", brand: "Honda", model: "Civic Eco 1.6", year: 2019, km: 91_000,
-    price: 925_000, images: [], segment: "Kelepir", status: "Opsiyonlu",
-    esnaf_notu: "Sol kapı değişmiş, orijinal parça. 1 saat içinde kapora geldi.",
-    ekspertiz_durumu: "Ekspertizli", fuel_type: "Dizel", transmission: "Manuel", created_at: "2025-01-14",
-  },
-  {
-    id: "SNC-007", brand: "Ford", model: "Focus Titanium 1.5 TDCI", year: 2018, km: 124_000,
-    price: 790_000, images: [], segment: "Orta Direk", status: "Aktif",
-    esnaf_notu: "Boyalı değişeni yok, sadece bir far değişmiş.",
-    ekspertiz_durumu: "Ekspertizli", fuel_type: "Dizel", transmission: "Manuel", created_at: "2025-01-16",
-  },
-  {
-    id: "SNC-008", brand: "Toyota", model: "Corolla 1.8 Hybrid", year: 2020, km: 56_000,
-    price: 1_150_000, images: [], segment: "Yayla Kan", status: "Aktif",
-    esnaf_notu: "Kazasız boyasız, hibrit avantajıyla az yakıyor.",
-    ekspertiz_durumu: "Ekspertizli", fuel_type: "Hibrit", transmission: "Otomatik", created_at: "2025-01-17",
-  },
-];
-
-const initialLeads: LeadBuying[] = [
-  { id: "LEAD-A01-001", customer_name: "Mustafa Yıldırım", phone: "905321234571", brand: "Ford", model: "Focus 1.6 TDCI", year: 2017, expected_price: 720_000, status: "Bekliyor" },
-  { id: "LEAD-A01-002", customer_name: "Ayşe Kaya", phone: "905331234572", brand: "Volkswagen", model: "Golf 1.4 TSI Highline", year: 2019, expected_price: 1_150_000, status: "Bekliyor" },
-  { id: "LEAD-A01-003", customer_name: "Hakan Demirel", phone: "905341234573", brand: "Renault", model: "Megane Sedan 1.5 dCi", year: 2020, expected_price: 875_000, status: "Bekliyor" },
-];
-
-/* ======================================================================== */
 /*  PAGE                                                                     */
 /* ======================================================================== */
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"vitrin" | "sat">("vitrin");
+
+  // Vitrin state
+  const [cars, setCars] = useState<Car[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Tok state
   const [tokOpen, setTokOpen] = useState(false);
   const [tokStartIndex, setTokStartIndex] = useState(0);
-  const [leads, setLeads] = useState<LeadBuying[]>(initialLeads);
+
+  // Lead state
+  const [leads, setLeads] = useState<LeadBuying[]>([]);
+  const [leadsLoading, setLeadsLoading] = useState(true);
+
+  // Karşılaştırma
   const [comparedIds, setComparedIds] = useState<string[]>([]);
 
   // Filtre state
@@ -89,9 +41,47 @@ export default function Home() {
   });
   const [sortBy, setSortBy] = useState<"price_asc" | "price_desc" | "newest">("newest");
 
-  // Filtreleme
+  /* ── Supabase'den araçları çek ── */
+  useEffect(() => {
+    async function fetchCars() {
+      setLoading(true);
+      setError(null);
+      const { data, error: err } = await supabase
+        .from("cars")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (err) {
+        setError(err.message);
+        setCars([]);
+      } else {
+        setCars((data as Car[]) ?? []);
+      }
+      setLoading(false);
+    }
+    fetchCars();
+  }, []);
+
+  /* ── Supabase'den lead'leri çek ── */
+  useEffect(() => {
+    async function fetchLeads() {
+      setLeadsLoading(true);
+      const { data, error: err } = await supabase
+        .from("leads_buying")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!err) {
+        setLeads((data as LeadBuying[]) ?? []);
+      }
+      setLeadsLoading(false);
+    }
+    fetchLeads();
+  }, []);
+
+  /* ── Filtreleme ── */
   const filteredCars = useMemo(() => {
-    let list = [...mockCars];
+    let list = [...cars];
     if (filters.brand) list = list.filter((c) => c.brand.toLowerCase().includes(filters.brand.toLowerCase()));
     if (filters.segment) list = list.filter((c) => c.segment === filters.segment);
     if (filters.priceMin) list = list.filter((c) => c.price >= Number(filters.priceMin));
@@ -107,10 +97,11 @@ export default function Home() {
     else list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
     return list;
-  }, [filters, sortBy]);
+  }, [cars, filters, sortBy]);
 
-  const tokCars = useMemo(() => mockCars.filter((c) => c.status !== "Satıldı"), []);
+  const tokCars = useMemo(() => cars.filter((c) => c.status !== "Satıldı"), [cars]);
 
+  /* ── Callback'ler ── */
   const openTok = useCallback((index: number = 0) => {
     setTokStartIndex(index);
     setTokOpen(true);
@@ -125,36 +116,50 @@ export default function Home() {
   }, []);
 
   const handleCompare = useCallback((id: string, checked: boolean) => {
-    setComparedIds((prev) =>
-      checked ? [...prev, id] : prev.filter((x) => x !== id)
-    );
-  }, []);
-
-  const handleFilterApply = useCallback(() => {
-    // filters state zaten güncel — sadece trigger için
+    setComparedIds((prev) => (checked ? [...prev, id] : prev.filter((x) => x !== id)));
   }, []);
 
   const pendingCount = leads.filter((l) => l.status === "Bekliyor").length;
 
+  /* ── Shimmer iskelet kart ── */
+  const ShimmerCard = () => (
+    <div className="animate-pulse rounded-xl border border-gray-100 bg-white overflow-hidden">
+      <div className="aspect-[4/3] bg-gray-200" />
+      <div className="p-4 space-y-3">
+        <div className="h-4 w-2/3 bg-gray-200 rounded" />
+        <div className="h-3 w-1/2 bg-gray-200 rounded" />
+        <div className="grid grid-cols-4 gap-1.5">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-10 bg-gray-200 rounded-lg" />
+          ))}
+        </div>
+        <div className="h-px bg-gray-100" />
+        <div className="h-6 w-1/2 bg-gray-200 rounded" />
+        <div className="flex gap-2">
+          <div className="flex-1 h-9 bg-gray-200 rounded-lg" />
+          <div className="h-9 w-9 bg-gray-200 rounded-lg" />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <main className="min-h-screen bg-[#f9fafb]">
-      {/* Navbar */}
       <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
-
-      {/* Borsa Ticker */}
       <BorsaTicker />
 
-      {/* ─── VİTRİN SEKMESİ ─── */}
+      {/* ─── VİTRİN ─── */}
       {activeTab === "vitrin" && (
         <section className="mx-auto max-w-7xl px-4 pb-12 pt-6 sm:px-6 lg:px-8">
-          {/* Hero Başlık */}
           <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-[#111827] sm:text-3xl">
-                Araç Listesi
-              </h1>
+              <h1 className="text-2xl font-bold tracking-tight text-[#111827] sm:text-3xl">Araç Listesi</h1>
               <p className="mt-0.5 text-sm text-gray-500">
-                <span className="font-semibold text-[#111827]">{filteredCars.length}</span> araç bulundu
+                {loading ? (
+                  <span className="text-gray-400">Yükleniyor...</span>
+                ) : (
+                  <><span className="font-semibold text-[#111827]">{filteredCars.length}</span> araç bulundu</>
+                )}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -167,31 +172,47 @@ export default function Home() {
                 <option value="price_asc">Fiyat (Artan)</option>
                 <option value="price_desc">Fiyat (Azalan)</option>
               </select>
-              <button
-                type="button"
-                onClick={() => openTok(0)}
-                className="rounded-lg bg-[#111827] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-gray-800"
-              >
-                Sancak Tok ({tokCars.length})
-              </button>
+              {!loading && (
+                <button
+                  type="button"
+                  onClick={() => openTok(0)}
+                  className="rounded-lg bg-[#111827] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-gray-800"
+                >
+                  Sancak Tok ({tokCars.length})
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Filtre + Grid */}
-          <div className="flex flex-col gap-6 md:flex-row">
-            {/* Sol – Filtre Paneli */}
-            <div className="w-full shrink-0 md:w-64">
-              <FilterPanel
-                filters={filters}
-                onChange={setFilters}
-                onApply={handleFilterApply}
-                carCount={filteredCars.length}
-              />
+          {/* Hata durumu */}
+          {error && (
+            <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              Araçlar yüklenirken bir hata oluştu: {error}
             </div>
+          )}
 
-            {/* Sağ – Araç Grid */}
+          <div className="flex flex-col gap-6 md:flex-row">
+            {/* Filtre Paneli */}
+            {!loading && !error && (
+              <div className="w-full shrink-0 md:w-64">
+                <FilterPanel
+                  filters={filters}
+                  onChange={setFilters}
+                  onApply={() => {}}
+                  carCount={filteredCars.length}
+                />
+              </div>
+            )}
+
+            {/* Araç Grid */}
             <div className="flex-1">
-              {filteredCars.length === 0 ? (
+              {loading ? (
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                    <ShimmerCard key={i} />
+                  ))}
+                </div>
+              ) : error ? null : filteredCars.length === 0 ? (
                 <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-gray-200 py-24 text-gray-400">
                   <p className="text-sm">Filtrelere uygun araç bulunamadı.</p>
                 </div>
@@ -212,7 +233,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* ─── ARACINI SAT SEKMESİ ─── */}
+      {/* ─── ARACINI SAT ─── */}
       {activeTab === "sat" && (
         <section className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -221,12 +242,22 @@ export default function Home() {
               <div className="mb-3 flex items-center gap-2">
                 <span className="text-xs text-gray-400">Yönetim Paneli (Admin)</span>
                 {pendingCount > 0 && (
-                  <span className="rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                    {pendingCount}
-                  </span>
+                  <span className="rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">{pendingCount}</span>
                 )}
               </div>
-              <AdminLeadPanel leads={leads} onStatusChange={handleLeadStatusChange} />
+              {leadsLoading ? (
+                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm animate-pulse">
+                  <div className="h-4 w-1/3 bg-gray-200 rounded mb-4" />
+                  {[1, 2].map((i) => (
+                    <div key={i} className="space-y-2 mb-4">
+                      <div className="h-4 w-1/2 bg-gray-200 rounded" />
+                      <div className="h-3 w-2/3 bg-gray-200 rounded" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <AdminLeadPanel leads={leads} onStatusChange={handleLeadStatusChange} />
+              )}
             </div>
           </div>
         </section>
@@ -238,21 +269,22 @@ export default function Home() {
       </footer>
 
       {/* Sancak Tok FAB */}
-      <div className="fixed bottom-6 right-6 z-40">
-        <button
-          type="button"
-          onClick={() => openTok(0)}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-[#111827] text-white shadow-lg transition-all hover:scale-110 active:scale-95"
-          aria-label="Sancak Tok"
-        >
-          <span className="relative flex items-center justify-center text-xl">
-            ▶
-            <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-green-400" />
-          </span>
-        </button>
-      </div>
+      {!loading && (
+        <div className="fixed bottom-6 right-6 z-40">
+          <button
+            type="button"
+            onClick={() => openTok(0)}
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-[#111827] text-white shadow-lg transition-all hover:scale-110 active:scale-95"
+            aria-label="Sancak Tok"
+          >
+            <span className="relative flex items-center justify-center text-xl">
+              ▶
+              <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-green-400" />
+            </span>
+          </button>
+        </div>
+      )}
 
-      {/* Sancak Tok Modal */}
       <SancakTokModal
         open={tokOpen}
         onClose={() => setTokOpen(false)}

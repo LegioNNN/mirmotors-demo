@@ -1,64 +1,51 @@
 import type { WhatsappNumber } from "@/types";
+import { supabase } from "@/lib/supabase";
 
 /* -------------------------------------------------------------------------- */
-/*  Personel Havuzu – Mock                                                    */
+/*  Supabase'den aktif personel havuzunu çek                                 */
 /* -------------------------------------------------------------------------- */
 
-const personnelPool: WhatsappNumber[] = [
-  {
-    id: "EMP-001",
-    phone_number: "905301234567",
-    employee_name: "Ahmet Sancaktar",
-    is_active: true,
-  },
-  {
-    id: "EMP-002",
-    phone_number: "905321234568",
-    employee_name: "Mehmet Yılmaz",
-    is_active: true,
-  },
-  {
-    id: "EMP-003",
-    phone_number: "905331234569",
-    employee_name: "Ali Demir",
-    is_active: true,
-  },
-  {
-    id: "EMP-004",
-    phone_number: "905341234570",
-    employee_name: "Can Kara",
-    is_active: false,
-  },
-];
+let cachedPersonnel: WhatsappNumber[] | null = null;
+let lastFetch = 0;
+const CACHE_TTL = 60_000;
+
+async function getActivePersonnel(): Promise<WhatsappNumber[]> {
+  const now = Date.now();
+  if (cachedPersonnel && now - lastFetch < CACHE_TTL) {
+    return cachedPersonnel;
+  }
+
+  const { data, error } = await supabase
+    .from("whatsapp_numbers")
+    .select("*")
+    .eq("is_active", true);
+
+  if (error) {
+    console.error("WhatsApp personel yüklenemedi:", error.message);
+    return [];
+  }
+
+  cachedPersonnel = (data as WhatsappNumber[]) ?? [];
+  lastFetch = now;
+  return cachedPersonnel;
+}
 
 /* -------------------------------------------------------------------------- */
-/*  Round-Robin sayaç                                                        */
+/*  Round-Robin                                                               */
 /* -------------------------------------------------------------------------- */
 
 let roundRobinIndex = 0;
 
-/* -------------------------------------------------------------------------- */
-/*  Seçici: Aktif personel havuzundan sıradaki numarayı döndür              */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Havuzdaki aktif personeller arasından sırayla (Round-Robin) seçim yapar.
- * @param mode "round-robin" (varsayılan) veya "random"
- * @returns Seçilen aktif WhatsappNumber veya null (hiç aktif personel yoksa)
- */
-export function selectPersonnel(
+export async function selectPersonnel(
   mode: "round-robin" | "random" = "round-robin"
-): WhatsappNumber | null {
-  const active = personnelPool.filter((p) => p.is_active);
-
+): Promise<WhatsappNumber | null> {
+  const active = await getActivePersonnel();
   if (active.length === 0) return null;
 
   if (mode === "random") {
-    const idx = Math.floor(Math.random() * active.length);
-    return active[idx];
+    return active[Math.floor(Math.random() * active.length)];
   }
 
-  // Round-Robin
   const selected = active[roundRobinIndex % active.length];
   roundRobinIndex = (roundRobinIndex + 1) % active.length;
   return selected;
@@ -68,10 +55,6 @@ export function selectPersonnel(
 /*  WhatsApp URL üreteci                                                      */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Seçilen personel ve araç bilgileriyle WhatsApp mesaj şablonu oluşturur.
- * Örnek çıktı: https://wa.me/905301234567?text=Selamın...
- */
 export function generateWhatsAppUrl(
   phoneNumber: string,
   brand: string,
@@ -81,29 +64,22 @@ export function generateWhatsAppUrl(
   const message = encodeURIComponent(
     `Selamın aleyküm Sancaktar Otomotiv, sitenizdeki ${brand} ${model} ${year} ilanı için kapora gönderip aracı ayırtmak istiyorum. Hesap numarası alabilir miyim?`
   );
-
-  // Uluslararası format: başında + yok, 9053XXXXXXXX
   const cleaned = phoneNumber.replace(/^\+/, "").replace(/[^0-9]/g, "");
   return `https://wa.me/${cleaned}?text=${message}`;
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Tek adımda: personel seç + URL oluştur                                   */
+/*  Tek adımda: personel seç + URL                                           */
 /* -------------------------------------------------------------------------- */
 
-/**
- * Bir araç için tek hamlede WhatsApp linki üretir.
- * @returns [url, employeeName] veya null
- */
-export function createKaporaLink(
+export async function createKaporaLink(
   brand: string,
   model: string,
   year: number,
   mode: "round-robin" | "random" = "round-robin"
-): { url: string; employeeName: string } | null {
-  const person = selectPersonnel(mode);
+): Promise<{ url: string; employeeName: string } | null> {
+  const person = await selectPersonnel(mode);
   if (!person) return null;
-
   const url = generateWhatsAppUrl(person.phone_number, brand, model, year);
   return { url, employeeName: person.employee_name };
 }

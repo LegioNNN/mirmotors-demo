@@ -52,9 +52,9 @@ export default function SancakTokModal({ open, onClose, cars, initialIndex = 0 }
     setCurrentIndex((p) => Math.max(0, Math.min(cars.length - 1, p + (diff > 0 ? 1 : -1))));
   };
 
-  const handleKapora = () => {
+  const handleKapora = async () => {
     if (!currentCar) return;
-    const result = createKaporaLink(currentCar.brand, currentCar.model, currentCar.year);
+    const result = await createKaporaLink(currentCar.brand, currentCar.model, currentCar.year);
     if (result) window.open(result.url, "_blank", "noopener,noreferrer");
     else alert("Şu anda tüm personelimiz yoğun.");
   };

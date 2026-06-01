@@ -1,6 +1,7 @@
 "use client";
 
 import type { LeadBuying, LeadStatus } from "@/types";
+import { supabase } from "@/lib/supabase";
 import { generateRedWhatsappUrl } from "@/utils/redWhatsapp";
 
 interface AdminLeadPanelProps {
@@ -17,6 +18,36 @@ const statusConfig: Record<LeadStatus, { label: string; bg: string; text: string
 };
 
 export default function AdminLeadPanel({ leads, onStatusChange }: AdminLeadPanelProps) {
+  const handleAccept = async (lead: LeadBuying) => {
+    const { error } = await supabase
+      .from("leads_buying")
+      .update({ status: "Kabul Edildi" })
+      .eq("id", lead.id);
+
+    if (!error) {
+      onStatusChange(lead.id, "Kabul Edildi");
+      const cleaned = lead.phone.replace(/^\+/, "").replace(/[^0-9]/g, "");
+      if (cleaned) window.open(`tel:${cleaned}`, "_blank");
+    } else {
+      console.error("Lead kabul edilemedi:", error.message);
+    }
+  };
+
+  const handleReject = async (lead: LeadBuying) => {
+    const { error } = await supabase
+      .from("leads_buying")
+      .update({ status: "Reddedildi" })
+      .eq("id", lead.id);
+
+    if (!error) {
+      onStatusChange(lead.id, "Reddedildi");
+      const url = generateRedWhatsappUrl(lead.phone, lead.brand, lead.model, lead.year);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+      console.error("Lead reddedilemedi:", error.message);
+    }
+  };
+
   if (leads.length === 0) {
     return (
       <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
@@ -52,49 +83,19 @@ export default function AdminLeadPanel({ leads, onStatusChange }: AdminLeadPanel
                 </span>
               </div>
               <div className="mt-2.5 grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-4">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-gray-400">Marka</span>
-                  <p className="text-gray-700">{lead.brand}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-gray-400">Model</span>
-                  <p className="text-gray-700">{lead.model}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-gray-400">Yıl</span>
-                  <p className="text-gray-700">{lead.year}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-gray-400">Beklenen</span>
-                  <p className="font-semibold text-[#111827]">{formatPrice(lead.expected_price)} ₺</p>
-                </div>
+                <div><span className="text-[10px] uppercase tracking-wider text-gray-400">Marka</span><p className="text-gray-700">{lead.brand}</p></div>
+                <div><span className="text-[10px] uppercase tracking-wider text-gray-400">Model</span><p className="text-gray-700">{lead.model}</p></div>
+                <div><span className="text-[10px] uppercase tracking-wider text-gray-400">Yıl</span><p className="text-gray-700">{lead.year}</p></div>
+                <div><span className="text-[10px] uppercase tracking-wider text-gray-400">Beklenen</span><p className="font-semibold text-[#111827]">{formatPrice(lead.expected_price)} ₺</p></div>
               </div>
               <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <span className="text-[10px] font-mono text-gray-400">#{lead.id}</span>
                 {!disabled && (
                   <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onStatusChange(lead.id, "Kabul Edildi");
-                        const cleaned = lead.phone.replace(/^\+/, "").replace(/[^0-9]/g, "");
-                        if (cleaned) window.open(`tel:${cleaned}`, "_blank");
-                      }}
-                      className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-[11px] font-bold text-white hover:bg-emerald-500"
-                    >
-                      KABUL ET / ARA
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onStatusChange(lead.id, "Reddedildi");
-                        const url = generateRedWhatsappUrl(lead.phone, lead.brand, lead.model, lead.year);
-                        window.open(url, "_blank", "noopener,noreferrer");
-                      }}
-                      className="rounded-lg bg-red-600 px-3.5 py-1.5 text-[11px] font-bold text-white hover:bg-red-500"
-                    >
-                      NAZİKÇE REDDET
-                    </button>
+                    <button type="button" onClick={() => handleAccept(lead)}
+                      className="rounded-lg bg-emerald-600 px-3.5 py-1.5 text-[11px] font-bold text-white hover:bg-emerald-500">KABUL ET / ARA</button>
+                    <button type="button" onClick={() => handleReject(lead)}
+                      className="rounded-lg bg-red-600 px-3.5 py-1.5 text-[11px] font-bold text-white hover:bg-red-500">NAZİKÇE REDDET</button>
                   </div>
                 )}
                 {lead.status === "Kabul Edildi" && <span className="text-[11px] text-emerald-600">Müşteri aranacak</span>}

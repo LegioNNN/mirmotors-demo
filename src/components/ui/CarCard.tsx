@@ -74,8 +74,8 @@ export default function CarCard({ car, onCompare, isCompared = false }: CarCardP
   const isSold = car.status === "Satıldı";
   const isOptioned = car.status === "Opsiyonlu";
 
-  const handleWp = () => {
-    const result = createKaporaLink(car.brand, car.model, car.year);
+  const handleWp = async () => {
+    const result = await createKaporaLink(car.brand, car.model, car.year);
     if (result) {
       window.open(result.url, "_blank", "noopener,noreferrer");
     } else {
