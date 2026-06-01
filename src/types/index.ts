@@ -2,6 +2,9 @@ export type CarSegment = "Kelepir" | "Orta Direk" | "Premium" | "Yayla Kan";
 
 export type CarStatus = "Aktif" | "Opsiyonlu" | "Satıldı";
 
+export type FuelType = "Benzin" | "Dizel" | "Elektrik" | "Hibrit" | "LPG";
+export type Transmission = "Manuel" | "Otomatik" | "Yarı Otomatik";
+
 export interface Car {
   id: string;
   brand: string;
@@ -15,6 +18,8 @@ export interface Car {
   segment: CarSegment;
   status: CarStatus;
   ekspertiz_durumu?: string;
+  fuel_type: FuelType;
+  transmission: Transmission;
   created_at: string;
 }
 
@@ -37,3 +42,4 @@ export interface LeadBuying {
   expected_price: number;
   status: LeadStatus;
 }
+

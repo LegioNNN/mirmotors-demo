@@ -2,10 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 
-/* -------------------------------------------------------------------------- */
-/*  Types & Mock Data                                                         */
-/* -------------------------------------------------------------------------- */
-
 interface TickerItem {
   label: string;
   value: number;
@@ -19,12 +15,7 @@ const defaultStats: TickerItem[] = [
   { label: "Aktif İnceleme", value: 1420, format: "number", emoji: "👁️" },
   { label: "Bugün Gelen Fırsat", value: 6, emoji: "💥" },
   { label: "Memnun Müşteri", value: 2850, emoji: "⭐" },
-  { label: "En Ucuz Fiyat Garantisi", value: 1, emoji: "🏆" },
 ];
-
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                   */
-/* -------------------------------------------------------------------------- */
 
 const formatValue = (item: TickerItem): string => {
   const n = item.value;
@@ -38,15 +29,7 @@ const formatValue = (item: TickerItem): string => {
   return new Intl.NumberFormat("tr-TR").format(n);
 };
 
-/* -------------------------------------------------------------------------- */
-/*  Component – Borusan Next Kurumsal Borsa Şeridi                           */
-/* -------------------------------------------------------------------------- */
-
-export default function BorsaTicker({
-  stats,
-}: {
-  stats?: TickerItem[];
-}) {
+export default function BorsaTicker({ stats }: { stats?: TickerItem[] }) {
   const items = stats ?? defaultStats;
   const [mounted, setMounted] = useState(false);
   const [tickerItems, setTickerItems] = useState<TickerItem[]>([]);
@@ -55,19 +38,15 @@ export default function BorsaTicker({
   useEffect(() => {
     setMounted(true);
     setTickerItems([...items]);
-
     intervalRef.current = setInterval(() => {
       setTickerItems((prev) =>
         prev.map((t) => {
-          const delta =
-            Math.random() > 0.55 ? Math.floor(Math.random() * 3) + 1 : 0;
+          const delta = Math.random() > 0.55 ? Math.floor(Math.random() * 3) + 1 : 0;
           const sign = Math.random() > 0.5 ? 1 : -1;
-          const newVal = Math.max(0, t.value + delta * sign);
-          return { ...t, value: newVal };
+          return { ...t, value: Math.max(0, t.value + delta * sign) };
         })
       );
     }, 10_000);
-
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
@@ -78,22 +57,16 @@ export default function BorsaTicker({
 
   return (
     <div className="relative w-full overflow-hidden border-b border-gray-200 bg-white select-none">
-      {/* Sol gradient mask */}
       <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-12 bg-gradient-to-r from-white to-transparent" />
-      {/* Sağ gradient mask */}
       <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-12 bg-gradient-to-l from-white to-transparent" />
-
       <div className="flex animate-scroll items-center gap-8 py-2.5 text-sm whitespace-nowrap">
-        {/* İlk kopya */}
         {tickerItems.map((t, idx) => (
           <TickerBadge key={`a-${idx}`} item={t} />
         ))}
-        {/* İkinci kopya (sonsuz döngü için) */}
         {tickerItems.map((t, idx) => (
           <TickerBadge key={`b-${idx}`} item={t} />
         ))}
       </div>
-
       <style jsx>{`
         @keyframes scroll {
           0% { transform: translateX(0); }
@@ -105,27 +78,15 @@ export default function BorsaTicker({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Inner badge                                                              */
-/* -------------------------------------------------------------------------- */
-
 function TickerBadge({ item }: { item: TickerItem }) {
   const isUp = Math.random() > 0.5;
   return (
     <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gray-50 border border-gray-100 px-3 py-1 text-gray-700">
       {item.emoji && <span className="text-sm leading-none">{item.emoji}</span>}
-      <span className="text-[11px] tracking-tight text-gray-500 font-medium uppercase">
-        {item.label}
-      </span>
+      <span className="text-[11px] tracking-tight text-gray-500 font-medium uppercase">{item.label}</span>
       <span className="text-gray-200">|</span>
-      <span className="font-mono font-bold text-gray-900 tabular-nums tracking-tight">
-        {formatValue(item)}
-      </span>
-      <span
-        className={`text-xs font-bold leading-none ${
-          isUp ? "text-green-600" : "text-red-500"
-        }`}
-      >
+      <span className="font-mono font-bold text-gray-900 tabular-nums tracking-tight">{formatValue(item)}</span>
+      <span className={`text-xs font-bold leading-none ${isUp ? "text-green-600" : "text-red-500"}`}>
         {isUp ? "▲" : "▼"}
       </span>
     </span>

@@ -1,24 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import type { Car, CarSegment } from "@/types";
 import { createKaporaLink } from "@/utils/whatsappBalancer";
 import { getCarImage } from "@/utils/carImages";
 
 /* -------------------------------------------------------------------------- */
-/*  Segment Dürüstlük Rozetleri — Borusan Next renk skalası                  */
+/*  Segment sabitleri                                                         */
 /* -------------------------------------------------------------------------- */
 
 const segmentConfig: Record<
   CarSegment,
-  {
-    label: string;
-    badgeBg: string;
-    badgeText: string;
-    badgeBorder: string;
-    dot: string;
-    icon: string;
-    tag: string;
-  }
+  { label: string; badgeBg: string; badgeText: string; badgeBorder: string; dot: string }
 > = {
   Kelepir: {
     label: "Kelepir",
@@ -26,8 +19,6 @@ const segmentConfig: Record<
     badgeText: "text-emerald-700",
     badgeBorder: "border-emerald-200",
     dot: "bg-emerald-500",
-    icon: "💸",
-    tag: "Fırsat",
   },
   "Orta Direk": {
     label: "Orta Direk",
@@ -35,8 +26,6 @@ const segmentConfig: Record<
     badgeText: "text-sky-700",
     badgeBorder: "border-sky-200",
     dot: "bg-sky-500",
-    icon: "⚖️",
-    tag: "Dengeli",
   },
   Premium: {
     label: "Premium",
@@ -44,8 +33,6 @@ const segmentConfig: Record<
     badgeText: "text-amber-700",
     badgeBorder: "border-amber-200",
     dot: "bg-amber-500",
-    icon: "👑",
-    tag: "Lüks",
   },
   "Yayla Kan": {
     label: "Yayla Kan",
@@ -53,25 +40,7 @@ const segmentConfig: Record<
     badgeText: "text-rose-700",
     badgeBorder: "border-rose-200",
     dot: "bg-rose-500",
-    icon: "🐂",
-    tag: "Sert",
   },
-};
-
-/* -------------------------------------------------------------------------- */
-/*  Satıldı alt metin havuzu                                                  */
-/* -------------------------------------------------------------------------- */
-
-const satildiAltMetin: Record<string, string[]> = {
-  Kelepir: ["2 Saatte Satıldı!", "Kapanı Kapandı!"],
-  "Orta Direk": ["1 Günde Gitti!", "Yeni Sahibine!"],
-  Premium: ["İzmir'e Gitti!", "Kapora Düştü!", "Ankara'ya Gitti!"],
-  "Yayla Kan": ["Kars'a Gitti!", "Motor Soğumadan Gitti!", "Dağlara Doğru!"],
-};
-
-const pickSatildiText = (segment: CarSegment): string => {
-  const pool = satildiAltMetin[segment] ?? ["Satıldı!"];
-  return pool[Math.floor(Math.random() * pool.length)];
 };
 
 /* -------------------------------------------------------------------------- */
@@ -79,10 +48,7 @@ const pickSatildiText = (segment: CarSegment): string => {
 /* -------------------------------------------------------------------------- */
 
 const formatPrice = (n: number) =>
-  new Intl.NumberFormat("tr-TR", {
-    style: "decimal",
-    minimumFractionDigits: 0,
-  }).format(n);
+  new Intl.NumberFormat("tr-TR", { style: "decimal", minimumFractionDigits: 0 }).format(n);
 
 const formatKm = (n: number) => new Intl.NumberFormat("tr-TR").format(n);
 
@@ -92,164 +58,157 @@ const formatKm = (n: number) => new Intl.NumberFormat("tr-TR").format(n);
 
 interface CarCardProps {
   car: Car;
-  onTokOpen?: () => void;
+  onCompare?: (id: string, checked: boolean) => void;
+  isCompared?: boolean;
 }
 
 /* -------------------------------------------------------------------------- */
-/*  Component                                                                 */
+/*  Bileşen                                                                   */
 /* -------------------------------------------------------------------------- */
 
-export default function CarCard({ car, onTokOpen }: CarCardProps) {
+export default function CarCard({ car, onCompare, isCompared = false }: CarCardProps) {
   const seg = segmentConfig[car.segment];
+  const carImage = getCarImage(car.id);
+  const [imgError, setImgError] = useState(false);
 
   const isSold = car.status === "Satıldı";
   const isOptioned = car.status === "Opsiyonlu";
-  const carImage = getCarImage(car.id);
 
-  const handleWpKapora = () => {
+  const handleWp = () => {
     const result = createKaporaLink(car.brand, car.model, car.year);
     if (result) {
       window.open(result.url, "_blank", "noopener,noreferrer");
     } else {
-      alert("Şu anda tüm personelimiz yoğun. Lütfen kısa süre sonra tekrar deneyin.");
+      alert("Şu anda tüm personelimiz yoğun.");
     }
   };
 
   return (
     <article
-      className={`group relative flex flex-col overflow-hidden rounded-xl border bg-white transition-all duration-200
-        ${
-          isSold
-            ? "border-gray-200 opacity-60 grayscale-[30%]"
-            : "border-gray-100 hover:shadow-xl hover:-translate-y-0.5"
-        }`}
+      className={`group relative flex flex-col overflow-hidden rounded-xl border bg-white transition-shadow ${
+        isSold ? "border-gray-200 opacity-60 grayscale-[30%]" : "border-gray-100 hover:shadow-lg"
+      }`}
     >
-      {/* ──────────────────────────────────────────────────────────────── */}
-      {/*  GÖRSEL — aspect-[16/9] · object-cover · hafif zoom on hover   */}
-      {/* ──────────────────────────────────────────────────────────────── */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-50">
-        <img
-          src={carImage}
-          alt={`${car.brand} ${car.model}`}
-          className={`h-full w-full object-cover transition-transform duration-500 ${
-            !isSold ? "group-hover:scale-105" : ""
-          }`}
-          loading="lazy"
-        />
+      {/* ── Görsel Alan ── */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-50">
+        {!imgError ? (
+          <img
+            src={carImage}
+            alt={`${car.brand} ${car.model}`}
+            className="h-full w-full object-cover"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-gray-300 text-sm">
+            Görsel
+          </div>
+        )}
 
-        {/* Hafif gradient taban — loş değil, sadece derinlik */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
-
-        {/* ── Segment Rozeti (sol üst) — Borusan soft badge ── */}
+        {/* Segment rozeti – sol üst */}
         <div
           className={`absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-semibold shadow-sm backdrop-blur-sm ${seg.badgeBg} ${seg.badgeText} ${seg.badgeBorder}`}
         >
           <span className={`h-1.5 w-1.5 rounded-full ${seg.dot}`} />
-          {seg.icon}
           {seg.label}
         </div>
 
-        {/* Yıl (sağ üst) — bone badge */}
-        <span className="absolute right-3 top-3 z-10 rounded-lg bg-white/80 px-2.5 py-1 text-xs font-bold text-gray-700 backdrop-blur-sm shadow-sm border border-white/50">
-          {car.year}
-        </span>
+        {/* Kalp ikonu – favori (sağ üst) */}
+        <button
+          type="button"
+          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-gray-400 shadow-sm backdrop-blur-sm transition-colors hover:text-red-500"
+          aria-label="Favorilere ekle"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+        </button>
 
-        {/* ── SATILDI — kurumsal damga ── */}
+        {/* SATILDI – köşegen kırmızı şerit */}
         {isSold && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center">
-            <div className="w-[85%] -translate-y-2 rotate-[-14deg] bg-red-600 py-3 text-center shadow-lg ring-2 ring-red-300 ring-offset-2 ring-offset-white/60">
-              <span className="block text-3xl font-black tracking-[0.25em] text-white drop-shadow-sm">
+          <div className="pointer-events-none absolute right-0 top-0 z-10">
+            <div className="relative">
+              <svg viewBox="0 0 120 120" className="h-28 w-28">
+                <polygon points="120,0 0,0 120,120" fill="#dc2626" />
+              </svg>
+              <span className="absolute right-1 top-3 -rotate-45 text-[10px] font-black tracking-wider text-white">
                 SATILDI
-              </span>
-              <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-wider text-red-100">
-                {pickSatildiText(car.segment)}
               </span>
             </div>
           </div>
         )}
 
-        {/* Opsiyonlu (alt sol) */}
+        {/* OPSİYONLU – köşegen sarı şerit */}
         {isOptioned && (
-          <div className="absolute bottom-3 left-3 z-10 rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-bold text-amber-700 shadow-sm backdrop-blur-sm">
-            OPSİYONLU
+          <div className="pointer-events-none absolute right-0 top-0 z-10">
+            <div className="relative">
+              <svg viewBox="0 0 120 120" className="h-28 w-28">
+                <polygon points="120,0 0,0 120,120" fill="#d97706" />
+              </svg>
+              <span className="absolute right-1 top-3 -rotate-45 text-[10px] font-black tracking-wider text-white">
+                OPSİYONLU
+              </span>
+            </div>
           </div>
-        )}
-
-        {/* Sancak Tok ▶ butonu (alt sağ) */}
-        {!isSold && onTokOpen && (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onTokOpen();
-            }}
-            className="absolute bottom-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/85 text-sm text-gray-700 shadow-md backdrop-blur-sm transition-all hover:scale-110 hover:bg-rose-500 hover:text-white active:scale-95"
-            aria-label="Sancak Tok'ta izle"
-          >
-            ▶
-          </button>
         )}
       </div>
 
-      {/* ──────────────────────────────────────────────────────────────── */}
-      {/*  KART İÇERİĞİ                                                    */}
-      {/* ──────────────────────────────────────────────────────────────── */}
-      <div className="flex flex-1 flex-col p-4">
-        {/* Başlık */}
-        <h3 className="text-base font-bold text-[#111827] leading-tight truncate">
-          {car.brand} {car.model}
-        </h3>
+      {/* ── Kart İçeriği ── */}
+      <div className="flex flex-col p-4">
+        {/* Marka + Model */}
+        <h3 className="text-sm font-bold text-[#111827]">{car.brand}</h3>
+        <p className="text-sm text-gray-500">{car.model}</p>
 
-        {/* Esnaf notu */}
-        {car.esnaf_notu && (
-          <p className="mt-1 text-xs leading-relaxed text-gray-500 line-clamp-2 italic border-l-2 border-amber-300 pl-2.5">
-            &ldquo;{car.esnaf_notu}&rdquo;
-          </p>
-        )}
-
-        {/* ── Borusan spec grid (Yıl, KM, ...) ── */}
-        <div className="mt-3 grid grid-cols-3 gap-1.5">
+        {/* Spec Grid – 4 kolonlu */}
+        <div className="mt-3 grid grid-cols-4 gap-1.5">
           <SpecBox label="Yıl" value={String(car.year)} />
           <SpecBox label="KM" value={`${formatKm(car.km)} km`} />
-          <SpecBox
-            label="Durum"
-            value={car.ekspertiz_durumu ?? "Belirtilmemiş"}
-          />
+          <SpecBox label="Yakıt" value={car.fuel_type} />
+          <SpecBox label="Vites" value={car.transmission} />
         </div>
 
         {/* Ayraç */}
         <div className="my-3 h-px w-full bg-gray-100" />
 
-        {/* ── Fiyat — düz, mat siyah, kurumsal ── */}
-        <div className="flex items-baseline justify-between">
+        {/* Fiyat + Karşılaştır */}
+        <div className="flex items-end justify-between">
           <span className="text-xl font-black tracking-tight text-[#111827]">
             {formatPrice(car.price)} ₺
           </span>
-          {!isSold && (
-            <span className="text-[10px] text-gray-400 font-mono">
-              #{car.id.slice(0, 6)}
-            </span>
-          )}
+          <label className="flex cursor-pointer items-center gap-1.5 text-[11px] text-gray-400">
+            <input
+              type="checkbox"
+              checked={isCompared}
+              onChange={(e) => onCompare?.(car.id, e.target.checked)}
+              className="h-3.5 w-3.5 rounded border-gray-300 text-[#111827] accent-gray-900"
+            />
+            Karşılaştır
+          </label>
         </div>
 
-        {/* ── KAPORA BUTONU — Kurumsal yeşil + ping ── */}
-        {isSold ? (
-          <div className="mt-3 text-right text-[11px] font-medium text-red-500/70">
-            Bu araç satılmıştır.
+        {/* Butonlar – "İncele" + WhatsApp */}
+        {!isSold ? (
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              className="flex-1 rounded-lg bg-[#111827] px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-gray-800"
+            >
+              İncele
+            </button>
+            <button
+              type="button"
+              onClick={handleWp}
+              className="flex items-center justify-center rounded-lg bg-green-700 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-green-600"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>
+            </button>
           </div>
         ) : (
-          <button
-            type="button"
-            onClick={handleWpKapora}
-            className="relative mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-green-700 px-3 py-2.5 text-xs font-bold text-white transition-all hover:bg-green-600 active:bg-green-800"
-          >
-            {/* Asil ping noktası — canlı yanıp söner */}
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-300 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-300" />
-            </span>
-            <span>Wp ile Kaporala</span>
-          </button>
+          <div className="mt-3 text-center text-[11px] font-medium text-red-500">
+            Bu araç satılmıştır.
+          </div>
         )}
       </div>
     </article>
@@ -257,16 +216,14 @@ export default function CarCard({ car, onTokOpen }: CarCardProps) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*  SpecBox — küçük gri bilgi hücresi, Borusan stili                        */
+/*  SpecBox – gri hücre                                                       */
 /* -------------------------------------------------------------------------- */
 
 function SpecBox({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-gray-50 px-2.5 py-1.5 text-center">
-      <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">
-        {label}
-      </p>
-      <p className="text-xs font-semibold text-gray-800">{value}</p>
+    <div className="rounded-lg bg-gray-50 px-1.5 py-1.5 text-center">
+      <p className="text-[9px] font-medium uppercase tracking-wider text-gray-400">{label}</p>
+      <p className="text-[11px] font-semibold text-gray-800 truncate">{value}</p>
     </div>
   );
 }
