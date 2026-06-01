@@ -1,0 +1,19 @@
+/**
+ * "Nazikçe Reddet" aksiyonu için WhatsApp URL'i üretir.
+ * Müşterinin aracını almama kararı sonrası otomatik şablon gönderir.
+ *
+ * @returns WhatsApp URL'i (yeni sekmede açılacak)
+ */
+export function generateRedWhatsappUrl(
+  customerPhone: string,
+  brand: string,
+  model: string,
+  year: number
+): string {
+  const message = encodeURIComponent(
+    `Sancaktar Otomotiv olarak teklifiniz için teşekkür ederiz. Yapılan piyasa ve stok değerlendirmesi sonucunda, ${brand} ${model} ${year} aracınız şu anki güncel alım konseptimize uygun bulunmamıştır. Hayırlı satışlar dileriz.`
+  );
+
+  const cleaned = customerPhone.replace(/^\+/, "").replace(/[^0-9]/g, "");
+  return `https://wa.me/${cleaned}?text=${message}`;
+}
