@@ -41,5 +41,14 @@ export interface LeadBuying {
   year: number;
   expected_price: number;
   status: LeadStatus;
+  km?: string | null;
+  damage_note?: string | null;
+  has_tramer?: boolean;
+  wants_trade?: boolean;
+  extra_note?: string | null;
+  city?: string | null;
+  district?: string | null;
+  contact_preference?: string;
+  kvkk_accepted?: boolean;
 }
 

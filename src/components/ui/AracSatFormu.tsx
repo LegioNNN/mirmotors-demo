@@ -39,7 +39,9 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
     if (!adSoyad.trim() || !telefon.trim() || !kvkk) return;
     setSubmitting(true);
 
-    const fiyat = fiyatBeklentisi ? parseInt(fiyatBeklentisi, 10) || 0 : 0;
+    const fiyat = fiyatBeklentisi
+      ? Number(fiyatBeklentisi.replace(/[^0-9]/g, ""))
+      : null;
     const leadId = `LEAD-${Date.now().toString(36).toUpperCase()}-001`;
 
     const { error: err } = await supabase.from("leads_buying").insert({
@@ -49,8 +51,17 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
       brand: marka,
       model: model,
       year: yil ?? 2020,
-      expected_price: fiyat,
+      expected_price: fiyat as number,
       status: "Bekliyor",
+      km: km.trim() || null,
+      damage_note: hasar.trim() || null,
+      has_tramer: tramer,
+      wants_trade: takas,
+      extra_note: ekNot.trim() || null,
+      city: sehir.trim() || null,
+      district: ilce.trim() || null,
+      contact_preference: iletisimTercihi,
+      kvkk_accepted: kvkk,
     });
 
     if (!err) {
@@ -61,7 +72,30 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
         brand: marka,
         model: model,
         year: yil ?? 2020,
-        expected_price: fiyat,
+        expected_price: fiyat as number,
+        status: "Bekliyor",
+        km: km.trim() || null,
+        damage_note: hasar.trim() || null,
+        has_tramer: tramer,
+        wants_trade: takas,
+        extra_note: ekNot.trim() || null,
+        city: sehir.trim() || null,
+        district: ilce.trim() || null,
+        contact_preference: iletisimTercihi,
+        kvkk_accepted: kvkk,
+      };
+      onAddLead(lead);
+    }
+
+    if (!err) {
+      const lead: LeadBuying = {
+        id: leadId,
+        customer_name: adSoyad.trim(),
+        phone: telefon.trim(),
+        brand: marka,
+        model: model,
+        year: yil ?? 2020,
+        expected_price: fiyat as number,
         status: "Bekliyor",
       };
       onAddLead(lead);
