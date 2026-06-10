@@ -3,15 +3,17 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { LeadBuying } from "@/types";
+import StepIndicator from "@/components/arac-sat/StepIndicator";
+import Step1AracBilgileri from "@/components/arac-sat/Step1AracBilgileri";
+import Step2DurumBilgileri from "@/components/arac-sat/Step2DurumBilgileri";
+import Step3Fiyat from "@/components/arac-sat/Step3Fiyat";
+import Step4Iletisim from "@/components/arac-sat/Step4iletisim";
 
 interface AracSatFormuProps {
   onAddLead: (lead: LeadBuying) => void;
 }
 
 type Adim = 1 | 2 | 3 | 4;
-
-const yillar = Array.from({ length: 16 }, (_, i) => 2010 + i);
-const markalar = ["BMW", "Fiat", "Ford", "Honda", "Hyundai", "Mercedes", "Renault", "Toyota", "Volkswagen", "Volvo"];
 
 export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
   const [adim, setAdim] = useState<Adim>(1);
@@ -23,19 +25,21 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
   const [tramer, setTramer] = useState(false);
   const [adSoyad, setAdSoyad] = useState("");
   const [telefon, setTelefon] = useState("");
+  const [fiyatBeklentisi, setFiyatBeklentisi] = useState("");
+  const [takas, setTakas] = useState(false);
+  const [ekNot, setEkNot] = useState("");
+  const [kvkk, setKvkk] = useState(false);
+  const [sehir, setSehir] = useState("");
+  const [ilce, setIlce] = useState("");
+  const [iletisimTercihi, setIletisimTercihi] = useState<"telefon" | "whatsapp">("telefon");
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const handlePhone = (v: string) => {
-    const cleaned = v.replace(/[^0-9+]/g, "");
-    setTelefon(cleaned.length > 15 ? telefon : cleaned);
-  };
-
   const handleSubmit = async () => {
-    if (!adSoyad.trim() || !telefon.trim()) return;
+    if (!adSoyad.trim() || !telefon.trim() || !kvkk) return;
     setSubmitting(true);
 
-    const fiyatTahmini = Math.floor(Math.random() * 200_000) + 300_000;
+    const fiyat = fiyatBeklentisi ? parseInt(fiyatBeklentisi, 10) || 0 : 0;
     const leadId = `LEAD-${Date.now().toString(36).toUpperCase()}-001`;
 
     const { error: err } = await supabase.from("leads_buying").insert({
@@ -45,7 +49,7 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
       brand: marka,
       model: model,
       year: yil ?? 2020,
-      expected_price: fiyatTahmini,
+      expected_price: fiyat,
       status: "Bekliyor",
     });
 
@@ -57,7 +61,7 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
         brand: marka,
         model: model,
         year: yil ?? 2020,
-        expected_price: fiyatTahmini,
+        expected_price: fiyat,
         status: "Bekliyor",
       };
       onAddLead(lead);
@@ -71,144 +75,236 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
       setMarka(""); setYil(null); setModel("");
       setKm(""); setHasar(""); setTramer(false);
       setAdSoyad(""); setTelefon("");
+      setFiyatBeklentisi(""); setTakas(false); setEkNot(""); setKvkk(false);
     }, 3000);
   };
 
-  /* ── Adım Göstergesi ── */
-  const StepIndicator = () => (
-    <div className="mb-6 flex items-center gap-1">
-      {([1, 2, 3, 4] as Adim[]).map((s, i) => (
-        <div key={s} className="flex flex-1 items-center">
-          <div
-            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-colors ${
-              adim === s ? "bg-[#111827] text-white" : adim > s ? "bg-green-600 text-white" : "bg-gray-100 text-gray-400"
-            }`}
-          >
-            {adim > s ? "✓" : s}
-          </div>
-          {i < 3 && <div className={`h-px flex-1 mx-1 ${adim > s + 1 ? "bg-green-600" : "bg-gray-200"}`} />}
-        </div>
-      ))}
-    </div>
-  );
-
-  const labelStyles = "mb-1 block text-[11px] font-semibold uppercase tracking-wider text-gray-500";
-  const inputStyles = "w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#111827] placeholder-gray-400 outline-none transition-colors focus:border-[#111827] focus:ring-1 focus:ring-gray-200";
-  const btnGrid = "rounded-lg border px-3 py-2 text-xs font-medium transition-colors text-center";
-
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
-      <h2 className="mb-1 text-base font-bold text-[#111827]">Aracını Sancaktar&apos;a Sat</h2>
-      <p className="mb-4 text-xs text-gray-500">4 adımda aracınızı değerlendirelim.</p>
+    <>
+      {/* ================================================================== */}
+      {/*  HERO ALANI - Aracini Sat                                           */}
+      {/* ================================================================== */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#0a0a0a] via-[#111827] to-[#1a2332]">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent" />
 
-      <StepIndicator />
+        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+          <div className="mx-auto max-w-2xl text-center lg:max-w-3xl">
+            {/* Rozet */}
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-green-500/30 bg-green-500/10 px-4 py-1.5 text-xs font-medium text-green-400 backdrop-blur-sm">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+              </span>
+              Istanbul Galeri &mdash; 750+ Araclik Stok
+            </div>
 
-      {submitted ? (
-        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-6 text-center text-sm text-green-800">
-          Talebiniz başarıyla alındı. Ekibimiz sizinle iletişime geçecek.
+            {/* Baslik */}
+            <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
+              Aracinizi{" "}
+              <span className="bg-gradient-to-r from-green-400 to-emerald-300 bg-clip-text text-transparent">
+                Sancaktar&rsquo;a
+              </span>{" "}
+              Satin
+            </h1>
+
+            {/* Alt baslik */}
+            <p className="mt-4 text-base leading-relaxed text-gray-300 sm:text-lg">
+              Arac bilgilerinizi gonderin, alim ekibimiz kisa surede sizinle
+              iletisime gecsin.
+            </p>
+
+            {/* Aciklama */}
+            <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-gray-500">
+              Fiyat tahmini vermiyoruz; aracinizin durumu, piyasa degeri ve stok
+              ihtiyacimiza gore sizi arayip degerlendirme yapiyoruz.
+            </p>
+
+            {/* Guven rozetleri */}
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { icon: "🛡️", label: "Ucretsiz On Degerlendirme" },
+                { icon: "⚡", label: "Hizli Geri Donus" },
+                { icon: "🔄", label: "Takas Imkani" },
+                { icon: "🔧", label: "Yerinde Ekspertiz" },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-center backdrop-blur-sm"
+                >
+                  <span className="text-xl">{item.icon}</span>
+                  <p className="mt-1 text-[10px] font-semibold leading-tight text-gray-400">
+                    {item.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      ) : (
-        <>
-          {/* ADIM 1 */}
-          {adim === 1 && (
-            <div className="space-y-4">
-              <div>
-                <label className={labelStyles}>Marka</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {markalar.map((m) => (
-                    <button key={m} type="button" onClick={() => setMarka(m)}
-                      className={`${btnGrid} ${marka === m ? "border-[#111827] bg-[#111827] text-white" : "border-gray-200 text-gray-600 hover:border-gray-300"}`}>{m}</button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className={labelStyles}>Model Yılı</label>
-                <div className="grid grid-cols-5 gap-1.5">
-                  {yillar.map((y) => (
-                    <button key={y} type="button" onClick={() => setYil(y)}
-                      className={`${btnGrid} ${yil === y ? "border-[#111827] bg-[#111827] text-white" : "border-gray-200 text-gray-600 hover:border-gray-300"}`}>{y}</button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className={labelStyles}>Model</label>
-                <input type="text" value={model} onChange={(e) => setModel(e.target.value)} placeholder="Örn: Clio 4 Joy 1.2" className={inputStyles} />
-              </div>
-              <div className="flex justify-end pt-2">
-                <button type="button" disabled={!marka || !yil || !model.trim()} onClick={() => setAdim(2)}
-                  className="rounded-lg bg-[#111827] px-6 py-2 text-sm font-bold text-white transition-colors hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed">Devam</button>
-              </div>
-            </div>
-          )}
+      </section>
 
-          {/* ADIM 2 */}
-          {adim === 2 && (
-            <div className="space-y-4">
-              <div>
-                <label className={labelStyles}>Kilometre</label>
-                <input type="text" inputMode="numeric" value={km} onChange={(e) => setKm(e.target.value.replace(/[^0-9]/g, ""))} placeholder="142.000" className={inputStyles} />
-              </div>
-              <div>
-                <label className={labelStyles}>Hasar Durumu</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {["Hasarsız", "Boyalı", "Değişen Parça", "Ağır Hasar"].map((h) => (
-                    <button key={h} type="button" onClick={() => setHasar(h)}
-                      className={`${btnGrid} ${hasar === h ? "border-[#111827] bg-[#111827] text-white" : "border-gray-200 text-gray-600 hover:border-gray-300"}`}>{h}</button>
-                  ))}
+      {/* ================================================================== */}
+      {/*  SUREC KARTLARI + FORM                                              */}
+      {/* ================================================================== */}
+      <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
+          {/* --- Sol: Surec Kartlari --- */}
+          <div className="lg:col-span-4">
+            <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-gray-400">
+              Surec Nasil Isler
+            </h3>
+            <div className="space-y-3">
+              {[
+                {
+                  adim: "1",
+                  baslik: "Bilgileri Gonder",
+                  aciklama: "Arac bilgilerini 4 adimda doldur, bize ulassin.",
+                },
+                {
+                  adim: "2",
+                  baslik: "Alim Ekibi Incelesin",
+                  aciklama: "Ekibimiz aracinizi piyasa ve stok durumuna gore degerlendirir.",
+                },
+                {
+                  adim: "3",
+                  baslik: "Sizi Arayalim",
+                  aciklama: "En kisa surede sizi arayip on degerlendirme sonucunu iletiriz.",
+                },
+                {
+                  adim: "4",
+                  baslik: "Randevu / Teklif",
+                  aciklama: "Ekspertiz randevusu veya uygun teklifimizi sunariz.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.adim}
+                  className="group flex items-start gap-3 rounded-xl border border-gray-200/80 bg-white px-4 py-4 shadow-sm transition-all hover:border-green-200 hover:shadow-md"
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#111827] text-[11px] font-bold text-white">
+                    {item.adim}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-[#111827]">{item.baslik}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-gray-500">
+                      {item.aciklama}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <input type="checkbox" checked={tramer} onChange={(e) => setTramer(e.target.checked)} className="h-4 w-4 rounded border-gray-300 accent-gray-900" />
-                <label className="text-xs text-gray-600">Tramer kaydı var</label>
-              </div>
-              <div className="flex justify-between pt-2">
-                <button type="button" onClick={() => setAdim(1)} className="rounded-lg border border-gray-200 px-6 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">Geri</button>
-                <button type="button" disabled={!km} onClick={() => setAdim(3)}
-                  className="rounded-lg bg-[#111827] px-6 py-2 text-sm font-bold text-white hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed">Devam</button>
-              </div>
+              ))}
             </div>
-          )}
+          </div>
 
-          {/* ADIM 3 */}
-          {adim === 3 && (
-            <div className="space-y-4">
-              <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-center">
-                <p className="text-xs text-green-600 uppercase tracking-wider font-semibold">Tahmini Değer</p>
-                <p className="mt-1 text-2xl font-black text-green-800">
-                  {new Intl.NumberFormat("tr-TR").format(Math.floor(Math.random() * 150_000) + 350_000)} ₺ -{" "}
-                  {new Intl.NumberFormat("tr-TR").format(Math.floor(Math.random() * 200_000) + 500_000)} ₺
+          {/* --- Sag: Form Kartı --- */}
+          <div className="lg:col-span-8">
+            <div className="rounded-2xl border border-gray-200 bg-white shadow-lg">
+              {/* Form ustu */}
+              <div className="border-b border-gray-100 px-6 py-5">
+                <h2 className="text-base font-bold text-[#111827]">
+                  Aracinizi Sancaktar&apos;a Satin
+                </h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  Bilgileri eksiksiz doldurun, talebiniz Sancaktar alim ekibine
+                  dussun.
                 </p>
-                <p className="mt-1 text-[11px] text-green-600">* Girilen bilgilere göre ortalama piyasa değeridir.</p>
               </div>
-              <div className="flex justify-between pt-2">
-                <button type="button" onClick={() => setAdim(2)} className="rounded-lg border border-gray-200 px-6 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">Geri</button>
-                <button type="button" onClick={() => setAdim(4)} className="rounded-lg bg-[#111827] px-6 py-2 text-sm font-bold text-white hover:bg-gray-800">Devam</button>
-              </div>
-            </div>
-          )}
 
-          {/* ADIM 4 */}
-          {adim === 4 && (
-            <div className="space-y-4">
-              <div>
-                <label className={labelStyles}>Ad Soyad <span className="text-red-500">*</span></label>
-                <input type="text" value={adSoyad} onChange={(e) => setAdSoyad(e.target.value)} placeholder="Adınız Soyadınız" className={inputStyles} />
-              </div>
-              <div>
-                <label className={labelStyles}>Telefon <span className="text-red-500">*</span></label>
-                <input type="tel" value={telefon} onChange={(e) => handlePhone(e.target.value)} placeholder="+90530 XXX XX XX" className={inputStyles} />
-              </div>
-              <div className="flex justify-between pt-2">
-                <button type="button" onClick={() => setAdim(3)} className="rounded-lg border border-gray-200 px-6 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">Geri</button>
-                <button type="button" disabled={!adSoyad.trim() || !telefon.trim() || submitting} onClick={handleSubmit}
-                  className="rounded-lg bg-green-700 px-6 py-2 text-sm font-bold text-white transition-colors hover:bg-green-600 disabled:opacity-40 disabled:cursor-not-allowed">
-                  {submitting ? "Gönderiliyor..." : "Teklif Al"}
-                </button>
+              {/* Form govde */}
+              <div className="px-6 py-5">
+                <StepIndicator adim={adim} />
+
+                {submitted ? (
+                  <div className="flex flex-col items-center gap-3 rounded-2xl border border-green-200 bg-green-50 px-6 py-10 text-center">
+                    {/* Basari ikonu */}
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-green-600">
+                      <svg
+                        className="h-7 w-7 text-white"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-lg font-black text-green-800">
+                        Talebiniz alindi
+                      </p>
+                      <p className="mt-1 text-sm text-green-700">
+                        Alim ekibimiz kisa surede sizinle iletisime gececek.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    {/* ADIM 1 */}
+                    {adim === 1 && (
+                      <Step1AracBilgileri
+                        marka={marka}
+                        yil={yil}
+                        model={model}
+                        onMarkaChange={setMarka}
+                        onYilChange={setYil}
+                        onModelChange={setModel}
+                        onDevam={() => setAdim(2)}
+                      />
+                    )}
+
+                    {/* ADIM 2 */}
+                    {adim === 2 && (
+                      <Step2DurumBilgileri
+                        km={km}
+                        hasar={hasar}
+                        tramer={tramer}
+                        onKmChange={setKm}
+                        onHasarChange={setHasar}
+                        onTramerChange={setTramer}
+                        onGeri={() => setAdim(1)}
+                        onDevam={() => setAdim(3)}
+                      />
+                    )}
+
+                    {/* ADIM 3 */}
+                    {adim === 3 && (
+                      <Step3Fiyat
+                        fiyatBeklentisi={fiyatBeklentisi}
+                        takas={takas}
+                        ekNot={ekNot}
+                        onFiyatBeklentisiChange={setFiyatBeklentisi}
+                        onTakasChange={setTakas}
+                        onEkNotChange={setEkNot}
+                        onGeri={() => setAdim(2)}
+                        onDevam={() => setAdim(4)}
+                      />
+                    )}
+
+                    {/* ADIM 4 */}
+                    {adim === 4 && (
+                      <Step4Iletisim
+                        adSoyad={adSoyad}
+                        telefon={telefon}
+                        sehir={sehir}
+                        ilce={ilce}
+                        iletisimTercihi={iletisimTercihi}
+                        kvkk={kvkk}
+                        submitting={submitting}
+                        onAdSoyadChange={setAdSoyad}
+                        onTelefonChange={setTelefon}
+                        onSehirChange={setSehir}
+                        onIlceChange={setIlce}
+                        onIletisimTercihiChange={setIletisimTercihi}
+                        onKvkkChange={setKvkk}
+                        onGeri={() => setAdim(3)}
+                        onSubmit={handleSubmit}
+                      />
+                    )}
+                  </>
+                )}
               </div>
             </div>
-          )}
-        </>
-      )}
-    </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
