@@ -217,15 +217,15 @@ export default function FilterPanel({ filters, onChange, onApply, carCount }: Fi
     onChange({ ...filters, [key]: val });
 
   const segmentOptions = [
-    { value: "Kelepir", label: "Kelepir", color: "bg-emerald-600 border-emerald-600" },
-    { value: "Orta Direk", label: "Orta Direk", color: "bg-sky-600 border-sky-600" },
-    { value: "Premium", label: "Premium", color: "bg-amber-600 border-amber-600" },
-    { value: "Yayla Kan", label: "Yayla Kan", color: "bg-rose-600 border-rose-600" },
+    { value: "Kelepir", label: "Fırsat", color: "bg-emerald-600 border-emerald-600" },
+    { value: "Yayla Kan", label: "Ekonomik", color: "bg-slate-600 border-slate-600" },
+    { value: "Orta Direk", label: "Orta Segment", color: "bg-indigo-700 border-indigo-700" },
+    { value: "Premium", label: "Premium", color: "bg-slate-900 border-slate-900" },
   ];
 
   const statusOptions = [
     { value: "Aktif", label: "Aktif", color: "bg-green-700 border-green-700" },
-    { value: "Opsiyonlu", label: "Opsiyonlu", color: "bg-amber-600 border-amber-600" },
+    { value: "Kaporalandı", label: "Kaporalandı", color: "bg-amber-600 border-amber-600" },
     { value: "Satıldı", label: "Satıldı", color: "bg-red-600 border-red-600" },
   ];
 
@@ -238,8 +238,6 @@ export default function FilterPanel({ filters, onChange, onApply, carCount }: Fi
     if (filters.priceMax) list.push({ label: `Fiyat max: ${Number(filters.priceMax).toLocaleString("tr-TR")}`, onRemove: () => set("priceMax", "") });
     if (filters.yearMin) list.push({ label: `Yıl min: ${filters.yearMin}`, onRemove: () => set("yearMin", "") });
     if (filters.yearMax) list.push({ label: `Yıl max: ${filters.yearMax}`, onRemove: () => set("yearMax", "") });
-    if (filters.kmMin) list.push({ label: `KM min: ${Number(filters.kmMin).toLocaleString("tr-TR")}`, onRemove: () => set("kmMin", "") });
-    if (filters.kmMax) list.push({ label: `KM max: ${Number(filters.kmMax).toLocaleString("tr-TR")}`, onRemove: () => set("kmMax", "") });
     if (filters.status) list.push({ label: `Durum: ${filters.status}`, onRemove: () => set("status", "") });
     return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -252,7 +250,13 @@ export default function FilterPanel({ filters, onChange, onApply, carCount }: Fi
       {/* Baslik */}
       <div className="border-b border-gray-100 px-5 py-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold text-[#111827]">Detayli Arac Arama</h2>
+          <div className="flex items-center gap-2">
+            <svg className="h-4 w-4 text-[#111827]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <h2 className="text-sm font-bold text-[#111827]">Detaylı Araç Arama</h2>
+          </div>
           {hasAnyFilter && (
             <button
               type="button"
@@ -303,8 +307,8 @@ export default function FilterPanel({ filters, onChange, onApply, carCount }: Fi
             <ChipSelect options={segmentOptions} selected={filters.segment} onSelect={(v) => set("segment", v)} />
           </AccordionSection>
 
-          {/* Fiyat */}
-          <AccordionSection title="Fiyat Araligi" open={openSections.price} onToggle={() => toggle("price")}>
+          {/* Fiyat Aralığı */}
+          <AccordionSection title="Fiyat Aralığı" open={openSections.price} onToggle={() => toggle("price")}>
             <MinMaxInput
               minValue={filters.priceMin}
               maxValue={filters.priceMax}
@@ -316,8 +320,8 @@ export default function FilterPanel({ filters, onChange, onApply, carCount }: Fi
             />
           </AccordionSection>
 
-          {/* Yil */}
-          <AccordionSection title="Model Yili" open={openSections.year} onToggle={() => toggle("year")}>
+          {/* Model Yılı */}
+          <AccordionSection title="Model Yılı" open={openSections.year} onToggle={() => toggle("year")}>
             <MinMaxInput
               minValue={filters.yearMin}
               maxValue={filters.yearMax}
@@ -325,19 +329,6 @@ export default function FilterPanel({ filters, onChange, onApply, carCount }: Fi
               onMaxChange={(v) => set("yearMax", v)}
               minPlaceholder="2010"
               maxPlaceholder="2025"
-            />
-          </AccordionSection>
-
-          {/* KM */}
-          <AccordionSection title="Kilometre" open={openSections.km} onToggle={() => toggle("km")}>
-            <MinMaxInput
-              minValue={filters.kmMin}
-              maxValue={filters.kmMax}
-              onMinChange={(v) => set("kmMin", v)}
-              onMaxChange={(v) => set("kmMax", v)}
-              minPlaceholder="0"
-              maxPlaceholder="500.000"
-              suffix="km"
             />
           </AccordionSection>
 
@@ -351,9 +342,9 @@ export default function FilterPanel({ filters, onChange, onApply, carCount }: Fi
         <button
           type="button"
           onClick={onApply}
-          className="mt-5 w-full rounded-lg bg-gradient-to-r from-green-800 to-green-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition-all hover:from-green-700 hover:to-green-600 hover:shadow-md active:scale-[0.98]"
+          className="mt-5 w-full rounded-lg bg-gradient-to-r from-[#1a2332] to-[#111827] px-5 py-3 text-sm font-bold text-white shadow-sm transition-all hover:from-[#111827] hover:to-gray-800 hover:shadow-md active:scale-[0.98]"
         >
-          Filtrele ({carCount} arac)
+          Filtrele ({carCount} araç)
         </button>
       </div>
     </aside>

@@ -4,19 +4,25 @@ import { useState } from "react";
 
 /* ======================================================================== */
 /*  Step1AracBilgileri - Adim 1: Arac Bilgileri                             */
-/*  Premium form: marka, model, paket/versiyon, yil, km,                    */
-/*  yakit tipi, vites tipi, kasa tipi, renk                                 */
+/*  Premium form: marka, model, paket/versiyon, yil,                        */
+/*  yakit tipi, vites tipi, kasa tipi                                       */
 /* ======================================================================== */
 
 interface Step1AracBilgileriProps {
   marka: string;
   yil: number | null;
   model: string;
-  km?: string;
+  paket: string;
+  yakit: string;
+  vites: string;
+  kasa: string;
   onMarkaChange: (val: string) => void;
   onYilChange: (val: number | null) => void;
   onModelChange: (val: string) => void;
-  onKmChange?: (val: string) => void;
+  onPaketChange: (val: string) => void;
+  onYakitChange: (val: string) => void;
+  onVitesChange: (val: string) => void;
+  onKasaChange: (val: string) => void;
   onDevam: () => void;
 }
 
@@ -26,19 +32,9 @@ const markalar = [
   "Audi", "Citroen", "Dacia", "Peugeot", "Skoda",
 ];
 
-const yakitTipleri = ["Benzin", "Dizel", "LPG", "Hibrit", "Elektrik"];
-const vitesTipleri = ["Manuel", "Otomatik", "Tiptronic", "CVT"];
-const kasaTipleri = ["Sedan", "Hatchback", "SUV", "Station Wagon", "Coupe", "Cabrio", "MPV", "Pickup"];
-const renkler = [
-  { label: "Beyaz", value: "beyaz", class: "bg-white border-gray-300" },
-  { label: "Siyah", value: "siyah", class: "bg-gray-900" },
-  { label: "Gri", value: "gri", class: "bg-gray-400" },
-  { label: "Gumus", value: "gumus", class: "bg-gray-200 border-gray-300" },
-  { label: "Mavi", value: "mavi", class: "bg-blue-600" },
-  { label: "Kirmizi", value: "kirmizi", class: "bg-red-600" },
-  { label: "Yesil", value: "yesil", class: "bg-green-700" },
-  { label: "Turuncu", value: "turuncu", class: "bg-orange-500" },
-];
+const yakitTipleri = ["Benzin", "Dizel", "LPG", "Benzin & LPG", "Hibrit", "Elektrik"];
+const vitesTipleri = ["Manuel", "Otomatik", "Yarı Otomatik"];
+const kasaTipleri = ["Sedan", "Hatchback", "SUV", "Station Wagon", "Coupe", "MPV", "Pickup", "Ticari"];
 
 const inputClass =
   "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-[#111827] placeholder-gray-400 outline-none ring-emerald-500/20 transition-all duration-200 focus:border-emerald-500 focus:ring-2";
@@ -49,18 +45,19 @@ export default function Step1AracBilgileri({
   marka,
   yil,
   model,
-  km = "",
+  paket,
+  yakit,
+  vites,
+  kasa,
   onMarkaChange,
   onYilChange,
   onModelChange,
-  onKmChange,
+  onPaketChange,
+  onYakitChange,
+  onVitesChange,
+  onKasaChange,
   onDevam,
 }: Step1AracBilgileriProps) {
-  const [paket, setPaket] = useState("");
-  const [yakit, setYakit] = useState("");
-  const [vites, setVites] = useState("");
-  const [kasa, setKasa] = useState("");
-  const [renk, setRenk] = useState("");
   const [markaAcik, setMarkaAcik] = useState(false);
   const [markaArama, setMarkaArama] = useState("");
 
@@ -174,8 +171,8 @@ export default function Step1AracBilgileri({
             id="step1-paket"
             type="text"
             value={paket}
-            onChange={(e) => setPaket(e.target.value)}
-            placeholder="Örn: Comfort, Executive, Style"
+            onChange={(e) => onPaketChange(e.target.value)}
+            placeholder="Örn: Joy, Touch, Icon, Elegance, AMG, M Sport..."
             className={inputClass}
           />
         </div>
@@ -199,22 +196,6 @@ export default function Step1AracBilgileri({
           />
         </div>
 
-        {/* Kilometre */}
-        <div>
-          <label htmlFor="step1-km" className={labelClass}>
-            Kilometre
-          </label>
-          <input
-            id="step1-km"
-            type="text"
-            inputMode="numeric"
-            value={km}
-            onChange={(e) => onKmChange?.(e.target.value.replace(/[^0-9]/g, ""))}
-            placeholder="Örn: 120.000"
-            className={inputClass}
-          />
-        </div>
-
         {/* Yakit Tipi */}
         <div>
           <label className={labelClass}>Yakıt Tipi</label>
@@ -223,7 +204,7 @@ export default function Step1AracBilgileri({
               <button
                 key={yt}
                 type="button"
-                onClick={() => setYakit(yakit === yt ? "" : yt)}
+                onClick={() => onYakitChange(yakit === yt ? "" : yt)}
                 className={`rounded-lg border px-3 py-2 text-xs font-medium transition-all duration-200 ${
                   yakit === yt
                     ? "border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/30"
@@ -244,7 +225,7 @@ export default function Step1AracBilgileri({
               <button
                 key={vt}
                 type="button"
-                onClick={() => setVites(vites === vt ? "" : vt)}
+                onClick={() => onVitesChange(vites === vt ? "" : vt)}
                 className={`rounded-lg border px-3 py-2 text-xs font-medium transition-all duration-200 ${
                   vites === vt
                     ? "border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/30"
@@ -265,7 +246,7 @@ export default function Step1AracBilgileri({
               <button
                 key={kt}
                 type="button"
-                onClick={() => setKasa(kasa === kt ? "" : kt)}
+                onClick={() => onKasaChange(kasa === kt ? "" : kt)}
                 className={`rounded-lg border px-3 py-2 text-xs font-medium transition-all duration-200 ${
                   kasa === kt
                     ? "border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/30"
@@ -273,42 +254,6 @@ export default function Step1AracBilgileri({
                 }`}
               >
                 {kt}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Renk */}
-        <div>
-          <label className={labelClass}>Renk</label>
-          <div className="flex flex-wrap gap-2">
-            {renkler.map((r) => (
-              <button
-                key={r.value}
-                type="button"
-                onClick={() => setRenk(renk === r.value ? "" : r.value)}
-                className={`group relative flex h-9 w-9 items-center justify-center rounded-full border-2 transition-all duration-200 ${
-                  renk === r.value
-                    ? "border-emerald-500 ring-2 ring-emerald-500/30 scale-110"
-                    : "border-gray-200 hover:border-gray-400"
-                } ${r.class}`}
-                title={r.label}
-              >
-                {renk === r.value && (
-                  <svg
-                    className={`h-4 w-4 ${
-                      ["beyaz", "gumus"].includes(r.value)
-                        ? "text-emerald-600"
-                        : "text-white"
-                    }`}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                )}
               </button>
             ))}
           </div>

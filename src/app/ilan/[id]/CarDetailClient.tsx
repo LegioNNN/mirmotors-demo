@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Car } from "@/types";
 import { createKaporaLink } from "@/utils/whatsappBalancer";
 import { getCarImage } from "@/utils/carImages";
+import { trackWhatsappClick } from "@/utils/trackWhatsappClick";
 import { segmentConfig, parseExpertise } from "@/utils/detailFormatters";
 import Navbar from "@/components/ui/Navbar";
 import CarDetailGallery from "./components/CarDetailGallery";
@@ -28,16 +29,31 @@ export default function CarDetailClient({ car }: Props) {
   const seg = segmentConfig[car.segment];
   const images = car.images?.length > 0 ? car.images : [getCarImage(car.id)];
 
-  const handleWp = useCallback(async () => {
+  const doWpClick = useCallback(async (source: "vehicle_detail_sidebar" | "vehicle_detail_mobile") => {
     setWpLoading(true);
     const result = await createKaporaLink(car.brand, car.model, car.year);
     setWpLoading(false);
     if (result) {
+      // Tracking - yönlendirmeyi engellemez
+      const message = `Selamın aleyküm Sancaktar Otomotiv, sitenizdeki ${car.brand} ${car.model} ${car.year} ilanı için kapora gönderip aracı ayırtmak istiyorum. Hesap numarası alabilir miyim?`;
+      trackWhatsappClick({
+        car_id: car.id,
+        car_brand: car.brand,
+        car_model: car.model,
+        car_year: car.year,
+        car_price: car.price,
+        source,
+        phone_target: result.url.match(/wa\.me\/(\d+)/)?.[1] ?? "",
+        message,
+      });
       window.open(result.url, "_blank", "noopener,noreferrer");
     } else {
       alert("Su anda tum personelimiz yogun.");
     }
   }, [car.brand, car.model, car.year]);
+
+  const handleWpSidebar = useCallback(() => doWpClick("vehicle_detail_sidebar"), [doWpClick]);
+  const handleWpMobile = useCallback(() => doWpClick("vehicle_detail_mobile"), [doWpClick]);
 
   const parts = parseExpertise(car.ekspertiz_durumu);
   const orijinalCount = parts.filter((p) => p.status === "orijinal").length;
@@ -47,7 +63,7 @@ export default function CarDetailClient({ car }: Props) {
   return (
     <main className="min-h-screen bg-[#f9fafb]">
       <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
-      <MobileWhatsappBar onClick={handleWp} loading={wpLoading} />
+      <MobileWhatsappBar car={car} onClick={handleWpMobile} loading={wpLoading} />
       <div className="mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:pb-12">
         <nav className="mb-6 flex items-center gap-1.5 text-xs">
           <Link href="/" className="font-medium text-gray-400 transition-colors hover:text-[#111827]">Sancaktar</Link>
@@ -59,7 +75,7 @@ export default function CarDetailClient({ car }: Props) {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           <CarDetailGallery images={images} brand={car.brand} model={car.model} segment={car.segment} segStyle={seg} />
-          <CarDetailSidebar car={car} onWpClick={handleWp} wpLoading={wpLoading} />
+          <CarDetailSidebar car={car} onWpClick={handleWpSidebar} wpLoading={wpLoading} />
         </div>
 
         <div className="mt-8">
@@ -68,7 +84,7 @@ export default function CarDetailClient({ car }: Props) {
           {detailTab === "ekspertiz" && (
             <ExpertiseTab parts={parts} orijinalCount={orijinalCount} boyaliCount={boyaliCount} degisenCount={degisenCount} />
           )}
-          {detailTab === "satici" && <SellerTab onWpClick={handleWp} wpLoading={wpLoading} />}
+          {detailTab === "satici" && <SellerTab onWpClick={handleWpSidebar} wpLoading={wpLoading} />}
         </div>
 
         <div className="mt-10 border-t border-gray-200 pt-6">

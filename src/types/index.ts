@@ -1,6 +1,12 @@
 export type CarSegment = "Kelepir" | "Orta Direk" | "Premium" | "Yayla Kan";
 
-export type CarStatus = "Aktif" | "Opsiyonlu" | "Satıldı";
+export type CarStatus = "Aktif" | "Kaporalandı" | "Satıldı" | "Yayından Kaldırıldı";
+
+/** UI'da gösterilecek durum etiketi - eski "Opsiyonlu" kayıtları da kapsar */
+export function displayStatus(status: string): string {
+  if (status === "Opsiyonlu" || status === "Kaporalandı") return "Kaporalandı";
+  return status;
+}
 
 export type FuelType = "Benzin" | "Dizel" | "Elektrik" | "Hibrit" | "LPG";
 export type Transmission = "Manuel" | "Otomatik" | "Yarı Otomatik";
@@ -17,6 +23,8 @@ export interface Car {
   esnaf_notu?: string;
   segment: CarSegment;
   status: CarStatus;
+  is_featured?: boolean;
+  is_hero?: boolean;
   ekspertiz_durumu?: string;
   fuel_type: FuelType;
   transmission: Transmission;
@@ -30,7 +38,7 @@ export interface WhatsappNumber {
   is_active: boolean;
 }
 
-export type LeadStatus = "Bekliyor" | "Kabul Edildi" | "Reddedildi";
+export type LeadStatus = "Bekliyor" | "Arandı" | "Ulaşılamadı" | "Tekrar Aranacak" | "Kabul Edildi" | "Reddedildi" | "Alım Yapıldı";
 
 export interface LeadBuying {
   id: string;
@@ -50,5 +58,8 @@ export interface LeadBuying {
   district?: string | null;
   contact_preference?: string;
   kvkk_accepted?: boolean;
+  admin_note?: string | null;
+  follow_up_at?: string | null;
+  photo_urls?: string[] | null;
 }
 

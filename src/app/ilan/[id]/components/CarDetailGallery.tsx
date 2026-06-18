@@ -41,9 +41,9 @@ export default function CarDetailGallery({ images, brand, model, segment, segSty
 
         {/* Segment rozeti - sol ust */}
         <div
-          className={`absolute left-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full border ${segStyle.border} ${segStyle.badge}/20 px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${segStyle.text} backdrop-blur-sm`}
+          className={`absolute left-4 top-4 z-10 inline-flex items-center gap-1.5 backdrop-blur-sm ${segStyle.wrapper}`}
         >
-          <span className={`h-1.5 w-1.5 rounded-full ${segStyle.badge}`} />
+          <span className={`h-1.5 w-1.5 rounded-full ${segStyle.accentDot}`} />
           {segStyle.label}
         </div>
 
@@ -83,6 +83,12 @@ export default function CarDetailGallery({ images, brand, model, segment, segSty
           ))}
         </div>
       )}
+
+      {/* Guvenli not - fotograflar temsilidir */}
+      <p className="mt-2 text-[10px] font-medium text-gray-400 text-right">
+        Fotoğraflar temsilidir. Araç bilgileri için danışmanla görüşünüz.
+      </p>
     </div>
   );
 }
+

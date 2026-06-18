@@ -1,42 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { Car, CarSegment } from "@/types";
 import { createKaporaLink } from "@/utils/whatsappBalancer";
 import { getCarImage } from "@/utils/carImages";
+import { trackWhatsappClick } from "@/utils/trackWhatsappClick";
 
 /* -------------------------------------------------------------------------- */
 /*  Segment sabitleri                                                         */
 /* -------------------------------------------------------------------------- */
 
-const segmentConfig: Record<
-  CarSegment,
-  { label: string; badge: string; border: string; text: string }
-> = {
+/* -------------------------------------------------------------------------- */
+/*  Segment sabitleri — koyu tabanlı, premium ilan etiketi stili              */
+/* -------------------------------------------------------------------------- */
+
+type SegmentBadgeStyle = {
+  label: string;
+  /** Badge wrapper class'ları — sadece metin, nokta/ikon yok */
+  wrapper: string;
+};
+
+const segmentConfig: Record<CarSegment, SegmentBadgeStyle> = {
   Kelepir: {
-    label: "Kelepir",
-    badge: "bg-emerald-500",
-    border: "border-emerald-500/30",
-    text: "text-emerald-400",
+    label: "FIRSAT",
+    wrapper:
+      "bg-emerald-700 text-emerald-100 border border-emerald-500/50 px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wider uppercase shadow-sm",
   },
   "Orta Direk": {
-    label: "Orta Direk",
-    badge: "bg-sky-500",
-    border: "border-sky-500/30",
-    text: "text-sky-400",
+    label: "ORTA SEGMENT",
+    wrapper:
+      "bg-indigo-900 text-indigo-100 border border-indigo-500/50 px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wider uppercase shadow-sm",
   },
   Premium: {
-    label: "Premium",
-    badge: "bg-amber-500",
-    border: "border-amber-500/30",
-    text: "text-amber-400",
+    label: "PREMIUM",
+    wrapper:
+      "bg-slate-950 text-amber-300 border border-amber-400/50 px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wider uppercase shadow-sm shadow-amber-900/30",
   },
   "Yayla Kan": {
-    label: "Yayla Kan",
-    badge: "bg-rose-500",
-    border: "border-rose-500/30",
-    text: "text-rose-400",
+    label: "EKONOMİK",
+    wrapper:
+      "bg-slate-600 text-slate-100 border border-slate-400/50 px-1.5 py-0.5 rounded text-[9px] font-extrabold tracking-wider uppercase shadow-sm",
   },
 };
 
@@ -84,26 +89,48 @@ function CarPlaceholder() {
 
 export default function CarCard({ car, onCompare, isCompared = false }: CarCardProps) {
   const seg = segmentConfig[car.segment];
-  const carImage = getCarImage(car.id);
-  const [imgError, setImgError] = useState(false);
+  const uploadedImage = car.images?.[0]?.trim();
+  const carImage = uploadedImage || getCarImage(car.id);
+    const [imgError, setImgError] = useState(false);
   const [favHover, setFavHover] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const router = useRouter();
+
+  const handleCardClick = useCallback(() => {
+    router.push(`/ilan/${car.id}`);
+  }, [router, car.id]);
 
   const isSold = car.status === "Satıldı";
-  const isOptioned = car.status === "Opsiyonlu";
+  const isOptioned = (car.status as string) === "Opsiyonlu" || car.status === "Kaporalandı";
+  const isFeatured = car.is_featured === true;
+  const hasPrice = car.price > 0;
 
-  const handleWp = async () => {
+        const handleWp = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     const result = await createKaporaLink(car.brand, car.model, car.year);
     if (result) {
+      // Tracking - yönlendirmeyi engellemez
+      const message = `Selamın aleyküm Sancaktar Otomotiv, sitenizdeki ${car.brand} ${car.model} ${car.year} ilanı için kapora gönderip aracı ayırtmak istiyorum. Hesap numarası alabilir miyim?`;
+      trackWhatsappClick({
+        car_id: car.id,
+        car_brand: car.brand,
+        car_model: car.model,
+        car_year: car.year,
+        car_price: car.price,
+        source: "car_card",
+        phone_target: result.url.match(/wa\.me\/(\d+)/)?.[1] ?? "",
+        message,
+      });
       window.open(result.url, "_blank", "noopener,noreferrer");
     } else {
       alert("Su anda tum personelimiz yogun.");
     }
   };
 
-  return (
+    return (
     <article
-      className={`group relative flex flex-col overflow-hidden rounded-xl border bg-white transition-all duration-300 ${
+      onClick={handleCardClick}
+      className={`group relative flex flex-col overflow-hidden rounded-xl border bg-white transition-all duration-300 cursor-pointer ${
         isSold
           ? "border-gray-200 opacity-55 grayscale-[40%]"
           : isOptioned
@@ -111,7 +138,7 @@ export default function CarCard({ car, onCompare, isCompared = false }: CarCardP
             : "border-gray-100 hover:-translate-y-1 hover:shadow-xl hover:shadow-gray-200/60"
       }`}
     >
-            {/* --- GORSEL ALAN --- */}
+      {/* --- GORSEL ALAN --- */}
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
         {!imgError ? (
           <>
@@ -129,7 +156,7 @@ export default function CarCard({ car, onCompare, isCompared = false }: CarCardP
             <img
               src={carImage}
               alt={`${car.brand} ${car.model}`}
-              className={`h-full w-full object-cover transition-all duration-500 group-hover:scale-105 ${
+              className={`h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-110 ${
                 imgLoaded ? "opacity-100" : "opacity-0"
               }`}
               loading="lazy"
@@ -145,18 +172,29 @@ export default function CarCard({ car, onCompare, isCompared = false }: CarCardP
           <CarPlaceholder />
         )}
 
-        {/* Segment rozeti - sol ust (cam efekti) */}
-        <div
-          className={`absolute left-3 top-3 z-30 inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1 text-[11px] font-semibold shadow-sm backdrop-blur-xl ${seg.border} ${seg.text}`}
-          style={{ backgroundColor: "rgba(255,255,255,0.12)" }}
-        >
-          <span className={`h-1.5 w-1.5 rounded-full ${seg.badge}`} />
-          {seg.label}
-        </div>
+                                                                                                                                                {/* Segment rozeti - sol ust - sadece Satıldı değilse ve öne çıkan değilse */}
+        {!isSold && !isFeatured && (
+          <div className={`absolute left-2 top-2 z-30 inline-flex items-center ${seg.wrapper}`}>
+            {seg.label}
+          </div>
+        )}
 
-        {/* Favori ikonu - sag ust (cam efekti) */}
+                {/* Öne Çıkan rozeti - premium sade tasarım */}
+        {!isSold && isFeatured && (
+          <div className="absolute left-2 top-2 z-30">
+            <div className="inline-flex items-center gap-1 rounded-[3px] bg-[#111827]/85 text-amber-400/90 border border-amber-500/25 px-1 py-[2px] text-[8px] font-bold tracking-wider uppercase shadow-[0_1px_3px_rgba(0,0,0,0.12)]">
+              <svg className="h-2 w-2" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+              ÖNE ÇIKAN
+            </div>
+          </div>
+        )}
+
+                {/* Favori ikonu - sag ust (cam efekti) */}
         <button
           type="button"
+          onClick={(e) => e.stopPropagation()}
           onMouseEnter={() => setFavHover(true)}
           onMouseLeave={() => setFavHover(false)}
           className="absolute right-3 top-3 z-30 flex h-8 w-8 items-center justify-center rounded-full text-gray-300 shadow-sm backdrop-blur-xl transition-all duration-200 hover:text-red-400"
@@ -174,90 +212,100 @@ export default function CarCard({ car, onCompare, isCompared = false }: CarCardP
           </svg>
         </button>
 
-        {/* SATILDI - overlay */}
+                {/* SATILDI - ince overlay + küçük etiket */}
         {isSold && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/30">
-            <span className="rotate-[-30deg] rounded-lg border-2 border-red-500 bg-red-600/90 px-6 py-2 text-sm font-black tracking-[0.25em] text-white shadow-xl backdrop-blur-sm">
-              SATILDI
-            </span>
-          </div>
+          <>
+            <div className="absolute inset-0 z-20 bg-gray-900/40" />
+            <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
+              <span className="inline-block rounded border border-red-400/60 bg-red-600/80 px-2 py-0.5 text-[10px] font-extrabold tracking-[0.2em] text-white shadow-sm backdrop-blur-sm">
+                SATILDI
+              </span>
+            </div>
+          </>
         )}
 
-        {/* OPSIYONLU - overlay */}
-        {isOptioned && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-amber-900/10">
-            <span className="rotate-[-30deg] rounded-lg border-2 border-amber-500 bg-amber-500/85 px-6 py-2 text-sm font-black tracking-[0.25em] text-white shadow-xl backdrop-blur-sm">
-              OPSIYONLU
-            </span>
-          </div>
-        )}
+                {/* KAPORALANDI - hafif amber overlay + küçük premium etiket */}
+                {isOptioned && (
+                  <>
+                    <div className="absolute inset-0 z-15 bg-gradient-to-br from-amber-400/10 via-amber-300/5 to-amber-500/15 mix-blend-overlay pointer-events-none" />
+                    <div className="absolute inset-0 z-20 bg-amber-900/10 backdrop-brightness-90" />
+                    <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
+                      <span className="inline-block rounded border border-amber-400/60 bg-amber-500/80 px-2 py-0.5 text-[10px] font-extrabold tracking-[0.2em] text-white shadow-sm backdrop-blur-sm">
+                        KAPORALANDI
+                      </span>
+                    </div>
+                  </>
+                )}
       </div>
 
             {/* --- KART ICERIGI --- */}
       <div className="flex flex-1 flex-col p-4">
-        {/* Marka + Model */}
+                {/* Marka + Model */}
         <div className="min-w-0">
-          <h3 className="text-sm font-bold leading-tight text-[#111827]">{car.brand}</h3>
-          <p className="mt-0.5 text-sm font-medium leading-tight text-gray-500">{car.model}</p>
+          <h3 className="text-base font-extrabold leading-tight text-[#111827] tracking-tight">
+            {car.brand}
+          </h3>
+          <p className="mt-0.5 text-sm font-semibold leading-tight text-gray-500">
+            {car.model}
+          </p>
         </div>
 
         {/* Spec Grid - 4 premium kutucuk */}
         <div className="mt-3 grid grid-cols-4 gap-1.5">
-          <SpecBadge label="Yil" value={String(car.year)} />
+                    <SpecBadge label="Yıl" value={String(car.year)} />
           <SpecBadge label="KM" value={`${formatKm(car.km)}`} />
-          <SpecBadge label="Yakit" value={car.fuel_type} />
+          <SpecBadge label="Yakıt" value={car.fuel_type} />
           <SpecBadge label="Vites" value={car.transmission} />
         </div>
 
-        {/* --- FIYAT + KARSILASTIR --- */}
+                                {/* --- FIYAT --- */}
         <div className="mt-3 flex items-end justify-between">
-          <div>
-            <p className="text-[10px] font-medium uppercase tracking-wider text-gray-400">Fiyat</p>
-            <span className="text-xl font-black tracking-tight text-[#111827]">
-              {formatPrice(car.price)} <span className="text-sm font-bold text-gray-500">TL</span>
-            </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Fiyat</p>
+            {hasPrice ? (
+              <span className="text-xl font-black tracking-tight text-[#111827]">
+                {formatPrice(car.price)}{" "}
+                <span className="text-sm font-bold text-gray-500">TL</span>
+              </span>
+            ) : (
+              <span className="text-sm font-extrabold tracking-tight text-green-700">
+                Fiyat için arayın
+              </span>
+            )}
           </div>
-          <label className="flex cursor-pointer items-center gap-1.5 text-[10px] font-medium text-gray-400 transition-colors hover:text-gray-600">
-            <input
-              type="checkbox"
-              checked={isCompared}
-              onChange={(e) => onCompare?.(car.id, e.target.checked)}
-              className="h-3.5 w-3.5 rounded border-gray-300 text-gray-900 accent-gray-900 transition-colors"
-            />
-            Karsilastir
-          </label>
         </div>
 
-        {/* --- BUTONLAR --- */}
+                {/* --- BUTONLAR --- */}
         {!isSold ? (
           <div className="mt-auto pt-3">
             <div className="flex gap-2">
-              <Link
+                            <Link
                 href={`/ilan/${car.id}`}
+                onClick={(e) => e.stopPropagation()}
                 className="flex-1 rounded-lg bg-gradient-to-r from-[#1a2332] to-[#111827] px-4 py-2.5 text-center text-xs font-bold text-white shadow-sm transition-all hover:from-[#111827] hover:to-gray-800 hover:shadow-md active:scale-[0.98]"
               >
-                Incele
+                Detaylı İncele
               </Link>
               <button
                 type="button"
                 onClick={handleWp}
-                className="flex items-center justify-center gap-1.5 rounded-lg bg-green-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-green-600 hover:shadow-md active:scale-[0.98] min-w-[44px]"
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-green-700 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-green-600 hover:shadow-md active:scale-[0.98]"
               >
                 <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                 </svg>
-                <span className="hidden sm:inline">Wp ile</span>
+                <span className="hidden sm:inline">WhatsApp</span>
               </button>
             </div>
           </div>
         ) : (
           <div className="mt-auto pt-3">
             <div className="rounded-lg bg-red-50 px-3 py-2.5 text-center text-[11px] font-medium text-red-500">
-              Bu arac satilmistir.
+              Bu araç satılmıştır.
             </div>
           </div>
         )}
-      </div>
+            </div>
     </article>
   );
 }

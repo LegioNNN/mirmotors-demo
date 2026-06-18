@@ -5,21 +5,26 @@ import { useState } from "react";
 /* ======================================================================== */
 /*  Step2DurumBilgileri - Adim 2: Arac Durumu                               */
 /*  Premium form: km, hasar, tramer, boya, degisen parca,                   */
-/*  tramer tutari, calisir durumda, rehin/haciz/kredi                        */
+/*  tramer tutari, calisir durumda, rehin/haciz/kredi, fotoğraflar          */
 /* ======================================================================== */
 
 interface Step2DurumBilgileriProps {
   km: string;
   hasar: string;
   tramer: boolean;
+  photoUrls: string[];
+  uploadingPhotos: boolean;
+  photoError: string | null;
   onKmChange: (val: string) => void;
   onHasarChange: (val: string) => void;
   onTramerChange: (val: boolean) => void;
+  onPhotoUpload: (files: FileList | null) => void;
+  onRemovePhoto: (url: string) => void;
   onGeri: () => void;
   onDevam: () => void;
 }
 
-const hasarSecenekleri = ["Hasarsiz", "Boyali", "Degisen Parca", "Agir Hasar"];
+const hasarSecenekleri = ["Hasarsız", "Boyalı", "Değişen Parça", "Ağır Hasar"];
 
 const inputClass =
   "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-[#111827] placeholder-gray-400 outline-none ring-emerald-500/20 transition-all duration-200 focus:border-emerald-500 focus:ring-2";
@@ -30,9 +35,14 @@ export default function Step2DurumBilgileri({
   km,
   hasar,
   tramer,
+  photoUrls,
+  uploadingPhotos,
+  photoError,
   onKmChange,
   onHasarChange,
   onTramerChange,
+  onPhotoUpload,
+  onRemovePhoto,
   onGeri,
   onDevam,
 }: Step2DurumBilgileriProps) {
@@ -42,8 +52,8 @@ export default function Step2DurumBilgileri({
   const [calisirDurumda, setCalisirDurumda] = useState<boolean | null>(null);
   const [rehinHacizKredi, setRehinHacizKredi] = useState("");
 
-  const boyaSecenekleri = ["Orjinal", "Yerel Boya", "Tam Boya", "Bilmiyorum"];
-  const degisenSecenekleri = ["Yok", "On", "Arka", "Sag", "Sol", "Birden Fazla"];
+  const boyaSecenekleri = ["Orijinal", "Yerel Boya", "Tam Boya", "Bilmiyorum"];
+  const degisenSecenekleri = ["Yok", "Ön", "Arka", "Sağ", "Sol", "Birden Fazla"];
   const rehinSecenekleri = ["Yok", "Rehin", "Haciz", "Kredi Borcu", "Birden Fazla"];
 
   return (
@@ -266,6 +276,90 @@ export default function Step2DurumBilgileri({
             ))}
           </div>
         </div>
+      </div>
+
+      {/* ================================================================== */}
+      {/*  Arac Fotograflari                                                  */}
+      {/* ================================================================== */}
+      <div>
+        <label className={labelClass}>Araç Fotoğrafları</label>
+        <p className="mb-3 text-xs text-gray-400">
+          Aracınızın ön, arka, yan ve iç kısımlarını gösteren en fazla 5 adet fotoğraf ekleyin.
+        </p>
+
+        {/* Onizleme alani */}
+        {photoUrls.length > 0 && (
+          <div className="mb-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
+            {photoUrls.map((url) => (
+              <div key={url} className="group relative aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+                <img
+                  src={url}
+                  alt="Araç fotoğrafı"
+                  className="h-full w-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => onRemovePhoto(url)}
+                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-red-600 group-hover:opacity-100"
+                  aria-label="Fotoğrafı kaldır"
+                >
+                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Yükleme alani */}
+        {photoUrls.length < 5 && (
+          <label
+            className={`relative flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-5 text-sm transition-all ${
+              uploadingPhotos
+                ? "border-gray-200 bg-gray-50 text-gray-400"
+                : "border-gray-300 bg-gray-50/50 text-gray-500 hover:border-emerald-400 hover:bg-emerald-50/30 hover:text-emerald-600"
+            }`}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="absolute inset-0 cursor-pointer opacity-0"
+              disabled={uploadingPhotos}
+              onChange={(e) => onPhotoUpload(e.target.files)}
+            />
+            {uploadingPhotos ? (
+              <>
+                <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <span>Fotoğraflar yükleniyor...</span>
+              </>
+            ) : (
+              <>
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                <span>Fotoğraf Yükle (en fazla 5)</span>
+              </>
+            )}
+          </label>
+        )}
+
+        {/* Hata mesaji */}
+        {photoError && (
+          <p className="mt-2 text-xs font-medium text-red-500">{photoError}</p>
+        )}
+
+        {/* Yükleme sayaci */}
+        <p className="mt-1.5 text-[10px] text-gray-400">
+          {photoUrls.length} / 5 fotoğraf yüklendi
+        </p>
       </div>
 
       {/* Bilgi notu */}

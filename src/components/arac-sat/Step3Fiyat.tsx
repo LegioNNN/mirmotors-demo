@@ -32,6 +32,9 @@ export default function Step3Fiyat({
   onGeri,
   onDevam,
 }: Step3FiyatProps) {
+  /* Fiyat bos mu? (sadece bosluklar da dahil) */
+  const fiyatBos = fiyatBeklentisi.trim() === "";
+
   /* Takas icin 3 secenekli local state: "evet" | "hayir" | "duruma-gore" */
   const takasSecenekleri = [
     { deger: "hayir", etiket: "Hayır", aciklama: "Takas düşünmüyorum" },
@@ -156,6 +159,13 @@ export default function Step3Fiyat({
         </div>
       </div>
 
+      {/* Fiyat uyarisi */}
+      {fiyatBos && (
+        <p className="text-xs leading-relaxed text-amber-600">
+          Fiyat beklentinizi yazmanız, ekibimizin daha hızlı dönüş yapmasını sağlar.
+        </p>
+      )}
+
       {/* Geri / Devam */}
       <div className="flex justify-between pt-1">
         <button
@@ -177,7 +187,8 @@ export default function Step3Fiyat({
         <button
           type="button"
           onClick={onDevam}
-          className="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-sm shadow-emerald-700/20 transition-all duration-200 hover:bg-emerald-600 hover:shadow-md hover:shadow-emerald-700/30 active:scale-[0.97]"
+          disabled={fiyatBos}
+          className="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-sm shadow-emerald-700/20 transition-all duration-200 hover:bg-emerald-600 hover:shadow-md hover:shadow-emerald-700/30 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:shadow-none disabled:active:scale-100"
         >
           Devam
           <svg
