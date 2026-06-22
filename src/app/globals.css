@@ -4,3 +4,63 @@ html, body {
   margin: 0;
   padding: 0;
 }
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+@keyframes shimmer-text {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+.hero-shimmer {
+  background: linear-gradient(
+    90deg,
+    #ffffff 0%,
+    #ffffff 30%,
+    #e8c97a 45%,
+    #ffe8a0 50%,
+    #e8c97a 55%,
+    #ffffff 70%,
+    #ffffff 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-text 4s linear infinite;
+}
+
+.hero-shimmer-sub {
+  background: linear-gradient(
+    90deg,
+    #9ca3af 0%,
+    #9ca3af 30%,
+    #e8c97a 45%,
+    #ffe8a0 50%,
+    #e8c97a 55%,
+    #9ca3af 70%,
+    #9ca3af 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-text 4s linear infinite;
+  animation-delay: 0.3s;
+}
+
+@keyframes breathing {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.animate-breathing {
+  animation: breathing 3s ease-in-out infinite;
+}

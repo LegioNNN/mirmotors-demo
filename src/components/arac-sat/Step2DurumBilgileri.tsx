@@ -49,8 +49,7 @@ export default function Step2DurumBilgileri({
   const [boyaDurumu, setBoyaDurumu] = useState("");
   const [degisenParca, setDegisenParca] = useState("");
   const [tramerTutari, setTramerTutari] = useState("");
-  const [calisirDurumda, setCalisirDurumda] = useState<boolean | null>(null);
-  const [rehinHacizKredi, setRehinHacizKredi] = useState("");
+const [rehinHacizKredi, setRehinHacizKredi] = useState("");
 
   const boyaSecenekleri = ["Orijinal", "Yerel Boya", "Tam Boya", "Bilmiyorum"];
   const degisenSecenekleri = ["Yok", "Ön", "Arka", "Sağ", "Sol", "Birden Fazla"];
@@ -143,33 +142,6 @@ export default function Step2DurumBilgileri({
           </div>
         </div>
 
-        {/* Araç Çalışır Durumda */}
-        <div>
-          <label className={labelClass}>Araç Çalışır Durumda mı?</label>
-          <div className="flex gap-2">
-            {[
-              { label: "Evet", value: true },
-              { label: "Hayır", value: false },
-            ].map((opt) => (
-              <button
-                key={opt.label}
-                type="button"
-                onClick={() =>
-                  setCalisirDurumda(
-                    calisirDurumda === opt.value ? null : opt.value
-                  )
-                }
-                className={`flex flex-1 items-center justify-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-200 ${
-                  calisirDurumda === opt.value
-                    ? "border-emerald-500 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/30"
-                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Tramer - modern kart */}
         <div className="md:col-span-2">
@@ -300,7 +272,7 @@ export default function Step2DurumBilgileri({
                 <button
                   type="button"
                   onClick={() => onRemovePhoto(url)}
-                  className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity hover:bg-red-600 group-hover:opacity-100"
+                  className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-red-600"
                   aria-label="Fotoğrafı kaldır"
                 >
                   <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>

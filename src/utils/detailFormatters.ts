@@ -3,7 +3,8 @@
 /*  Ortak formatter fonksiyonlari - ilan detay sayfasi icin                 */
 /* ======================================================================== */
 
-import type { CarSegment } from "@/types";
+import type { CarSegment, EkspertizData, EkspertizDurum } from "@/types";
+import { EKSPERTIZ_PARTS } from "@/components/ui/AdminEkspertizPanel";
 
 /**
  * Fiyati "1.234.567" formatina cevirir
@@ -53,7 +54,7 @@ export const segmentConfig: Record<CarSegment, SegmentStyle> = {
 /* -------------------------------------------------------------------------- */
 export interface ExpertisePart {
   label: string;
-  status: "orijinal" | "boyali" | "degisen";
+  status: "orijinal" | "lokal_boyali" | "boyali" | "degisen";
 }
 
 export const defaultParts: ExpertisePart[] = [
@@ -72,18 +73,53 @@ export const defaultParts: ExpertisePart[] = [
   { label: "Bagaj", status: "orijinal" },
 ];
 
+const DURUM_MAP: Record<EkspertizDurum, ExpertisePart["status"]> = {
+  "Orijinal":     "orijinal",
+  "Lokal Boyalı": "lokal_boyali",
+  "Boyalı":       "boyali",
+  "Değişen":      "degisen",
+};
+
+const LABEL_MAP: Record<string, string> = {
+  sol_on_camurluk:   "Sol Ön Çamurluk",
+  sol_on_kapi:       "Sol Ön Kapı",
+  sol_arka_kapi:     "Sol Arka Kapı",
+  sol_arka_camurluk: "Sol Arka Çamurluk",
+  on_tampon:         "Ön Tampon",
+  kaput:             "Kaput",
+  tavan:             "Tavan",
+  bagaj:             "Bagaj",
+  arka_tampon:       "Arka Tampon",
+  sag_on_camurluk:   "Sağ Ön Çamurluk",
+  sag_on_kapi:       "Sağ Ön Kapı",
+  sag_arka_kapi:     "Sağ Arka Kapı",
+  sag_arka_camurluk: "Sağ Arka Çamurluk",
+};
+
 /**
- * Ekspertiz durumu string'ini parse eder, hata durumunda defaultParts doner
+ * EkspertizData objesini ExpertisePart dizisine çevirir.
+ * Geriye dönük uyumluluk için eski string/array formatını da destekler.
  */
 export function parseExpertise(
-  ekspertiz_durumu: string | null | undefined
+  ekspertiz_durumu: EkspertizData | string | null | undefined
 ): ExpertisePart[] {
   if (!ekspertiz_durumu) return defaultParts;
-  try {
-    const parsed = JSON.parse(ekspertiz_durumu);
-    if (Array.isArray(parsed)) return parsed as ExpertisePart[];
-  } catch {
-    /* ignore */
+
+  // Yeni format: obje
+  if (typeof ekspertiz_durumu === "object" && !Array.isArray(ekspertiz_durumu)) {
+    return EKSPERTIZ_PARTS.map((p) => ({
+      label: LABEL_MAP[p.key] ?? p.label,
+      status: DURUM_MAP[(ekspertiz_durumu as EkspertizData)[p.key] ?? "Orijinal"] ?? "orijinal",
+    }));
   }
+
+  // Eski string/array format
+  if (typeof ekspertiz_durumu === "string") {
+    try {
+      const parsed = JSON.parse(ekspertiz_durumu);
+      if (Array.isArray(parsed)) return parsed as ExpertisePart[];
+    } catch { /* ignore */ }
+  }
+
   return defaultParts;
 }

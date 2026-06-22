@@ -62,7 +62,7 @@ export function generateWhatsAppUrl(
   year: number
 ): string {
   const message = encodeURIComponent(
-    `Selamın aleyküm Sancaktar Otomotiv, sitenizdeki ${brand} ${model} ${year} ilanı için kapora gönderip aracı ayırtmak istiyorum. Hesap numarası alabilir miyim?`
+    `Merhaba Sancaktar Otomotiv, sitenizdeki ${brand} ${model} ${year} ilanıyla ilgileniyorum.`
   );
   const cleaned = phoneNumber.replace(/^\+/, "").replace(/[^0-9]/g, "");
   return `https://wa.me/${cleaned}?text=${message}`;

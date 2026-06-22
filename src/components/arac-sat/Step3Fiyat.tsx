@@ -32,8 +32,15 @@ export default function Step3Fiyat({
   onGeri,
   onDevam,
 }: Step3FiyatProps) {
-  /* Fiyat bos mu? (sadece bosluklar da dahil) */
-  const fiyatBos = fiyatBeklentisi.trim() === "";
+  /* Fiyat TL formatında göster: 1250000 → "1.250.000" */
+  const formatTL = (raw: string) => {
+    const digits = raw.replace(/[^0-9]/g, "");
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
+  const handleFiyatChange = (v: string) => {
+    onFiyatBeklentisiChange(v.replace(/[^0-9]/g, ""));
+  };
+  const displayFiyat = formatTL(fiyatBeklentisi);
 
   /* Takas icin 3 secenekli local state: "evet" | "hayir" | "duruma-gore" */
   const takasSecenekleri = [
@@ -80,11 +87,9 @@ export default function Step3Fiyat({
             id="step3-fiyat"
             type="text"
             inputMode="numeric"
-            value={fiyatBeklentisi}
-            onChange={(e) =>
-              onFiyatBeklentisiChange(e.target.value.replace(/[^0-9]/g, ""))
-            }
-            placeholder="Örn: 1.250.000 TL"
+            value={displayFiyat}
+            onChange={(e) => handleFiyatChange(e.target.value)}
+            placeholder="400.000"
             className={`${inputClass} pl-10`}
           />
         </div>
@@ -159,12 +164,6 @@ export default function Step3Fiyat({
         </div>
       </div>
 
-      {/* Fiyat uyarisi */}
-      {fiyatBos && (
-        <p className="text-xs leading-relaxed text-amber-600">
-          Fiyat beklentinizi yazmanız, ekibimizin daha hızlı dönüş yapmasını sağlar.
-        </p>
-      )}
 
       {/* Geri / Devam */}
       <div className="flex justify-between pt-1">
@@ -187,8 +186,8 @@ export default function Step3Fiyat({
         <button
           type="button"
           onClick={onDevam}
-          disabled={fiyatBos}
-          className="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-sm shadow-emerald-700/20 transition-all duration-200 hover:bg-emerald-600 hover:shadow-md hover:shadow-emerald-700/30 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:shadow-none disabled:active:scale-100"
+          disabled={fiyatBeklentisi.trim() === ""}
+          className="inline-flex items-center gap-2 rounded-xl bg-emerald-700 px-6 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-emerald-600 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-40"
         >
           Devam
           <svg

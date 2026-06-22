@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Car } from "@/types";
 import AdminVehicleCard from "./AdminVehicleCard";
+import AdminEditDrawer from "./AdminEditDrawer";
+import AdminEkspertizPanel, { DEFAULT_EKSPERTIZ } from "./AdminEkspertizPanel";
 import type { FormData as CardFormData } from "./AdminVehicleCard";
 import { uploadCarImage } from "@/utils/uploadCarImage";
 
@@ -22,7 +24,9 @@ const defaultForm: FormData = {
   transmission: "Otomatik",
   segment: "Orta Direk",
   status: "Aktif",
-  image_url: "",
+  video_url: "",
+  esnaf_notu: "",
+  ekspertiz_durumu: DEFAULT_EKSPERTIZ,
   is_featured: false,
   is_hero: false,
 };
@@ -42,16 +46,18 @@ export default function AdminVehiclePanel() {
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState<FormData>(defaultForm);
+  const [newCarImages, setNewCarImages] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
   const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
   const [editingCarId, setEditingCarId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<FormData>(defaultForm);
   const [editingSaving, setEditingSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
+  const [addingImageId, setAddingImageId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,6 +88,7 @@ export default function AdminVehiclePanel() {
   /* ------------------------------------------------------------------------ */
   const resetForm = () => {
     setForm(defaultForm);
+    setNewCarImages([]);
     setSaveError(null);
   };
 
@@ -106,7 +113,7 @@ export default function AdminVehiclePanel() {
     setUploadError(null);
     try {
       const publicUrl = await uploadCarImage(file);
-      setForm((prev) => ({ ...prev, image_url: publicUrl }));
+      setNewCarImages((prev) => [...prev, publicUrl]);
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Fotoğraf yüklenirken hata oluştu.");
     } finally {
@@ -114,96 +121,41 @@ export default function AdminVehiclePanel() {
     }
   };
 
-  const handleEditFileUpload = async (carId: string, file: File) => {
-    // 3. Araç ID kontrolü
-    if (!carId) {
-      const msg = "Araç ID bulunamadı, fotoğraf kaydedilemedi.";
-      setUploadError(msg);
-      console.error("[handleEditFileUpload] carId yok");
-      return;
-    }
+  const handleRemoveNewCarImage = (url: string) => {
+    setNewCarImages((prev) => prev.filter((u) => u !== url));
+  };
 
-    setUploadingImage(true);
-    setUploadError(null);
-    setUploadSuccess(null);
+  const handleAddImage = async (carId: string, file: File) => {
+    setAddingImageId(carId);
     try {
       const publicUrl = await uploadCarImage(file);
-
-      // 4. publicUrl boş kontrolü
-      if (!publicUrl) {
-        const msg = "Fotoğraf URL'i oluşturulamadı.";
-        setUploadError(msg);
-        console.error("[handleEditFileUpload] publicUrl boş", { carId });
-        return;
-      }
-
-      // 5. Kesin imzalı Supabase update + select
-      const { data, error: updateErr } = await supabase
-        .from("cars")
-        .update({
-          images: [publicUrl],
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", carId)
-        .select("id, brand, model, images, updated_at")
-        .single();
-
-      // 9. Debug log
-      if (updateErr) {
-        console.error("[handleEditFileUpload] Supabase update hatası", { carId, publicUrl, error: updateErr });
-      }
-
-      // 6. Update sonrası data.images doğrulaması
-      if (updateErr) {
-        setUploadError("Fotoğraf yüklendi ama araç kaydına işlenemedi: " + updateErr.message);
-        return;
-      }
-
-      if (!data) {
-        console.error("[handleEditFileUpload] data yok", { carId, publicUrl });
-        setUploadError("Fotoğraf yüklendi ama veritabanına kaydedilemedi.");
-        return;
-      }
-
-      if (!data.images || data.images.length === 0) {
-        console.error("[handleEditFileUpload] data.images boş", { carId, publicUrl, data });
-        setUploadError("Fotoğraf yüklendi ama veritabanına kaydedilemedi.");
-        return;
-      }
-
-      // Sadece data.images[0] publicUrl ile eşleşiyorsa başarılı
-      if (data.images[0] !== publicUrl) {
-        console.error("[handleEditFileUpload] images[0] publicUrl ile eşleşmiyor", { carId, publicUrl, dataImages: data.images });
-        setUploadError("Fotoğraf yüklendi ama veritabanına kaydedilemedi.");
-        return;
-      }
-
-      // 7. Başarılı → local vehicles state'i güncelle
-      setVehicles((prev) =>
-        prev.map((vehicle) =>
-          vehicle.id === carId ? { ...vehicle, ...data } : vehicle
-        )
-      );
-
-      // 8. Aynı araç düzenleniyorsa editForm.image_url güncelle
-      if (editingCarId === carId) {
-        setEditForm((prev) => ({ ...prev, image_url: publicUrl }));
-      }
-
-      // 6 sonu: sadece veritabanına gerçekten yazıldıysa başarılı
-      setUploadSuccess("Fotoğraf yüklendi ve araca kaydedildi.");
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Fotoğraf yüklenirken hata oluştu.";
-      setUploadError(msg);
-      console.error("[handleEditFileUpload] catch", { carId, error: err });
+      const car = vehicles.find((v) => v.id === carId);
+      const newImages = [...(car?.images ?? []), publicUrl];
+      const { error: err } = await supabase.from("cars").update({ images: newImages }).eq("id", carId);
+      if (!err) setVehicles((prev) => prev.map((c) => c.id === carId ? { ...c, images: newImages } : c));
+    } catch {
+      // silent — user can retry
     } finally {
-      setUploadingImage(false);
-      setTimeout(() => setUploadSuccess(null), 4000);
+      setAddingImageId(null);
     }
   };
 
+  const handleRemoveImage = async (carId: string, imageUrl: string) => {
+    const car = vehicles.find((v) => v.id === carId);
+    const newImages = (car?.images ?? []).filter((u) => u !== imageUrl);
+    const { error: err } = await supabase.from("cars").update({ images: newImages }).eq("id", carId);
+    if (!err) setVehicles((prev) => prev.map((c) => c.id === carId ? { ...c, images: newImages } : c));
+  };
+
+  const handleDelete = async (carId: string) => {
+    setDeletingId(carId);
+    const { error: err } = await supabase.from("cars").delete().eq("id", carId);
+    if (!err) setVehicles((prev) => prev.filter((c) => c.id !== carId));
+    setDeletingId(null);
+  };
+
   const handleSave = async () => {
-    if (!form.brand.trim() || !form.model.trim() || !form.price.trim()) {
+    if (!form.brand.trim() || !form.model.trim() || !form.year.trim() || !form.price.trim() || !form.km.trim()) {
       setSaveError("Marka, model ve fiyat zorunludur.");
       return;
     }
@@ -218,8 +170,6 @@ export default function AdminVehiclePanel() {
       return;
     }
 
-    const images: string[] = form.image_url.trim() ? [form.image_url.trim()] : [];
-
     const payload = {
       brand: form.brand.trim(),
       model: form.model.trim(),
@@ -230,7 +180,10 @@ export default function AdminVehiclePanel() {
       transmission: form.transmission,
       segment: form.segment,
       status: form.status,
-      images,
+      images: newCarImages,
+      video_url: form.video_url.trim() || null,
+      esnaf_notu: form.esnaf_notu.trim() || null,
+      ekspertiz_durumu: form.ekspertiz_durumu,
       is_featured: form.is_featured,
       created_at: new Date().toISOString(),
     };
@@ -248,6 +201,26 @@ export default function AdminVehiclePanel() {
     }
 
     setVehicles((prev) => [data as Car, ...prev]);
+
+    // Subscribers'a bildirim gönder
+    try {
+      const { data: subs } = await supabase
+        .from("notifications_subscriptions")
+        .select("*")
+        .eq("is_active", true);
+
+      if (subs && subs.length > 0) {
+        const notificationPayload = subs.map((sub: any) => ({
+          car_id: data.id,
+          subscriber_email: sub.email,
+          subscriber_phone: sub.phone,
+        }));
+        await supabase.from("notifications_sent").insert(notificationPayload);
+      }
+    } catch (notifError) {
+      console.error("Bildirim gönderme hatası:", notifError);
+    }
+
     resetForm();
     setFormOpen(false);
     setCurrentPage(1);
@@ -352,7 +325,9 @@ export default function AdminVehiclePanel() {
     transmission: car.transmission,
     segment: car.segment,
     status: car.status,
-    image_url: (car.images?.length ?? 0) > 0 ? car.images[0] : "",
+    video_url: car.video_url ?? "",
+    esnaf_notu: car.esnaf_notu ?? "",
+    ekspertiz_durumu: (car.ekspertiz_durumu as import("@/types").EkspertizData) ?? DEFAULT_EKSPERTIZ,
     is_featured: car.is_featured ?? false,
     is_hero: car.is_hero ?? false,
   });
@@ -393,11 +368,6 @@ export default function AdminVehiclePanel() {
       return;
     }
 
-    // images alanını koru: form'da image_url varsa kullan, yoksa mevcut images'i koru
-    const images: string[] = editForm.image_url.trim()
-      ? [editForm.image_url.trim()]
-      : (vehicles.find((v) => v.id === carId)?.images ?? []);
-
     const payload = {
       brand: editForm.brand.trim(),
       model: editForm.model.trim(),
@@ -408,7 +378,9 @@ export default function AdminVehiclePanel() {
       transmission: editForm.transmission,
       segment: editForm.segment,
       status: editForm.status,
-      images,
+      video_url: editForm.video_url.trim() || null,
+      esnaf_notu: editForm.esnaf_notu.trim() || null,
+      ekspertiz_durumu: editForm.ekspertiz_durumu,
       is_featured: editForm.is_featured,
     };
 
@@ -433,11 +405,12 @@ export default function AdminVehiclePanel() {
               year: payload.year ?? c.year,
               price: parsedPrice,
               km: payload.km ?? c.km,
-              images,
               fuel_type: payload.fuel_type as Car["fuel_type"],
               transmission: payload.transmission as Car["transmission"],
               segment: payload.segment as Car["segment"],
               status: payload.status as Car["status"],
+              video_url: payload.video_url ?? undefined,
+              esnaf_notu: payload.esnaf_notu ?? undefined,
               is_featured: payload.is_featured,
             }
           : c
@@ -550,80 +523,87 @@ export default function AdminVehiclePanel() {
     );
   }
 
+  const activeCount = vehicles.filter((c) => c.status === "Aktif").length;
+  const featuredCount = vehicles.filter((c) => c.is_featured).length;
+
   return (
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3.5 sm:px-6">
-        <h2 className="text-sm font-bold text-[#111827]">Stoktaki Araçlar</h2>
-        <div className="flex items-center gap-3">
+
+      {/* ── Header: başlık + istatistik + büyük ekle butonu ── */}
+      <div className="border-b border-gray-100 px-5 py-4">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-base font-black text-[#111827]">Stoktaki Araçlar</h2>
+            <div className="mt-1 flex items-center gap-3 text-xs text-gray-400">
+              <span><span className="font-bold text-[#111827]">{vehicles.length}</span> toplam</span>
+              <span className="text-gray-200">|</span>
+              <span><span className="font-bold text-emerald-600">{activeCount}</span> aktif</span>
+              <span className="text-gray-200">|</span>
+              <span><span className="font-bold text-amber-600">{featuredCount}</span> vitrinde</span>
+            </div>
+          </div>
           <button
             type="button"
             onClick={handleFormToggle}
-            className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-[11px] font-bold transition-all ${
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all active:scale-[0.97] ${
               formOpen
                 ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                : "bg-[#111827] text-white hover:bg-gray-800"
+                : "bg-[#111827] text-white hover:bg-gray-800 shadow-sm"
             }`}
           >
             {formOpen ? (
               <>
-                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
-                Kapat
+                Formu Kapat
               </>
             ) : (
               <>
-                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <path d="M12 5v14m-7-7h14" />
                 </svg>
-                Yeni Araç Ekle
+                + Yeni Araç Ekle
               </>
             )}
           </button>
-          <span className="rounded-md bg-gray-50 px-2 py-0.5 text-[11px] font-mono text-gray-500 border border-gray-100">
-            {vehicles.length}
-          </span>
         </div>
       </div>
 
-      {/* Arama + Filtre Alanı */}
-      <div className="border-b border-gray-100 px-5 py-3 sm:px-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          {/* Arama inputu */}
-          <div className="relative flex-1 max-w-xs">
-            <svg className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      {/* ── Filtre çubuğu ── */}
+      <div className="border-b border-gray-100 bg-gray-50/40 px-4 py-2.5">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Arama */}
+          <div className="relative min-w-[180px] flex-1 max-w-xs">
+            <svg className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Marka veya model ara..."
-              className="w-full rounded-lg border border-gray-200 pl-9 pr-3 py-1.5 text-[11px] text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#111827]"
+              placeholder="Marka / model ara..."
+              className="w-full rounded-lg border border-gray-200 bg-white pl-8 pr-3 py-1.5 text-xs text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/10"
             />
           </div>
-          {/* Status filtre butonları */}
+
+          {/* Durum filtreleri — renkli pill'ler */}
           <div className="flex items-center gap-1.5 flex-wrap">
-            {(["Tümü", "Aktif", "Kaporalandı", "Satıldı", "Yayından Kaldırıldı"] as const).map((s) => {
-              const count = s === "Tümü" ? vehicles.length : vehicles.filter((c) => c.status === s).length;
-              const isActive = s === "Tümü" ? !statusFilter : statusFilter === s;
+            {([
+              { label: "Tümü", value: null, color: "bg-[#111827] text-white", idle: "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50" },
+              { label: "Aktif", value: "Aktif", color: "bg-emerald-600 text-white", idle: "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100" },
+              { label: "Kaporalandı", value: "Kaporalandı", color: "bg-amber-500 text-white", idle: "bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100" },
+              { label: "Satıldı", value: "Satıldı", color: "bg-red-500 text-white", idle: "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100" },
+              { label: "Yayından Kaldırıldı", value: "Yayından Kaldırıldı", color: "bg-gray-500 text-white", idle: "bg-gray-50 text-gray-500 border border-gray-200 hover:bg-gray-100" },
+            ] as const).map(({ label, value, color, idle }) => {
+              const count = value === null ? vehicles.length : vehicles.filter((c) => c.status === value).length;
+              const isActive = value === null ? !statusFilter : statusFilter === value;
               return (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => setStatusFilter(s === "Tümü" ? null : s)}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all ${
-                    isActive
-                      ? "bg-[#111827] text-white shadow-sm"
-                      : "bg-gray-50 text-gray-500 border border-gray-200 hover:bg-gray-100"
-                  }`}
-                >
-                  {s}
-                  <span className={`${isActive ? "text-gray-300" : "text-gray-400"} font-mono`}>
-                    ({count})
-                  </span>
+                <button key={label} type="button"
+                  onClick={() => setStatusFilter(value)}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold transition-all ${isActive ? color : idle}`}>
+                  {label}
+                  <span className={`font-mono text-[10px] ${isActive ? "opacity-70" : "opacity-60"}`}>{count}</span>
                 </button>
               );
             })}
@@ -631,216 +611,186 @@ export default function AdminVehiclePanel() {
         </div>
       </div>
 
-      {/* Form Alanı */}
+      {/* ── Yeni Araç Formu ── */}
       {formOpen && (
-        <div className="border-b border-gray-100 bg-gray-50/50 px-5 py-5 sm:px-6">
-          <div className="grid grid-cols-1 gap-x-5 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Marka */}
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">
-                Marka <span className="text-red-400">*</span>
-              </label>
-              <input
-                type="text"
-                value={form.brand}
-                onChange={(e) => handleFormChange("brand", e.target.value)}
-                placeholder="Örn: BMW"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#111827]"
-              />
+        <div className="border-b border-gray-100 bg-[#f8f9fb] px-5 py-6 sm:px-6">
+
+          {/* Form başlık */}
+          <div className="mb-5 flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#111827]">
+              <svg className="h-4 w-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path d="M12 5v14m-7-7h14" />
+              </svg>
             </div>
-            {/* Model */}
             <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">
-                Model <span className="text-red-400">*</span>
-              </label>
-              <input
-                type="text"
-                value={form.model}
-                onChange={(e) => handleFormChange("model", e.target.value)}
-                placeholder="Örn: 320i M Sport"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#111827]"
-              />
-            </div>
-            {/* Yıl */}
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">Yıl</label>
-              <input
-                type="text"
-                value={form.year}
-                onChange={(e) => handleFormChange("year", e.target.value)}
-                placeholder="Örn: 2022"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#111827]"
-              />
-            </div>
-            {/* Fiyat */}
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">
-                Fiyat (₺) <span className="text-red-400">*</span>
-              </label>
-              <input
-                type="text"
-                value={form.price}
-                onChange={(e) => handleFormChange("price", e.target.value)}
-                placeholder="Örn: 2850000"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#111827]"
-              />
-            </div>
-            {/* KM */}
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">KM</label>
-              <input
-                type="text"
-                value={form.km}
-                onChange={(e) => handleFormChange("km", e.target.value)}
-                placeholder="Örn: 22000"
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#111827]"
-              />
-            </div>
-            {/* Fotoğraf Yükle */}
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">Fotoğraf Yükle</label>
-              <div className="flex items-center gap-2">
-                <label className={`relative flex cursor-pointer items-center gap-1.5 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-500 transition-all hover:border-gray-400 hover:text-gray-700 ${uploadingImage ? "opacity-50 pointer-events-none" : ""}`}>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="absolute inset-0 cursor-pointer opacity-0"
-                    disabled={uploadingImage}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleFileUpload(file);
-                      e.currentTarget.value = "";
-                    }}
-                  />
-                  {uploadingImage ? (
-                    <>
-                      <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Yükleniyor...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
-                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                        <polyline points="17 8 12 3 7 8" />
-                        <line x1="12" y1="3" x2="12" y2="15" />
-                      </svg>
-                      Yükle
-                    </>
-                  )}
-                </label>
-                {uploadingImage && (
-                  <span className="text-[10px] text-emerald-600 font-medium">Fotoğraf yükleniyor...</span>
-                )}
-                {!uploadingImage && form.image_url && (
-                  <span className="text-[10px] text-emerald-600 font-medium">✓ Görsel seçildi</span>
-                )}
-              </div>
-              {uploadSuccess && (
-                <p className="mt-1 text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg px-2 py-1">{uploadSuccess}</p>
-              )}
-              {uploadError && (
-                <p className="mt-1 text-[10px] font-medium text-red-500">{uploadError}</p>
-              )}
-            </div>
-            {/* Yakıt */}
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">Yakıt</label>
-              <select
-                value={form.fuel_type}
-                onChange={(e) => handleFormChange("fuel_type", e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#111827]"
-              >
-                <option value="Benzin">Benzin</option>
-                <option value="Dizel">Dizel</option>
-                <option value="Elektrik">Elektrik</option>
-                <option value="Hibrit">Hibrit</option>
-                <option value="LPG">LPG</option>
-              </select>
-            </div>
-            {/* Vites */}
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">Vites</label>
-              <select
-                value={form.transmission}
-                onChange={(e) => handleFormChange("transmission", e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#111827]"
-              >
-                <option value="Otomatik">Otomatik</option>
-                <option value="Manuel">Manuel</option>
-                <option value="Yarı Otomatik">Yarı Otomatik</option>
-              </select>
-            </div>
-            {/* Segment */}
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">Segment</label>
-              <select
-                value={form.segment}
-                onChange={(e) => handleFormChange("segment", e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#111827]"
-              >
-                <option value="Kelepir">Fırsat</option>
-                <option value="Orta Direk">Orta Segment</option>
-                <option value="Premium">Premium</option>
-              </select>
-            </div>
-            {/* Durum */}
-            <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">Durum</label>
-              <select
-                value={form.status}
-                onChange={(e) => handleFormChange("status", e.target.value)}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#111827]"
-              >
-                <option value="Aktif">Aktif</option>
-                <option value="Kaporalandı">Kaporalandı</option>
-                <option value="Satıldı">Satıldı</option>
-                <option value="Yayından Kaldırıldı">Yayından Kaldırıldı</option>
-              </select>
-            </div>
-            {/* Vitrinde Öne Çıkar */}
-            <div className="flex items-end pb-2">
-              <label className="flex cursor-pointer items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={form.is_featured}
-                  onChange={(e) => {
-                    setForm((prev) => ({ ...prev, is_featured: e.target.checked }));
-                    setSaveError(null);
-                  }}
-                  className="h-4 w-4 rounded border-gray-300 text-amber-500 accent-amber-500 focus:ring-amber-500"
-                />
-                <span className="text-[11px] font-medium text-gray-600 select-none">Vitrinde öne çıkar</span>
-              </label>
+              <h3 className="text-sm font-black text-[#111827]">Yeni Araç Ekle</h3>
+              <p className="text-[11px] text-gray-400">Zorunlu alanları doldurup kaydedin</p>
             </div>
           </div>
 
-          {/* Hata mesajı */}
-          {saveError && (
-            <p className="mt-3 text-xs font-medium text-red-500">{saveError}</p>
-          )}
-
-          {/* Kaydet butonu */}
-          <div className="mt-4 flex justify-end">
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={saving || !form.brand.trim() || !form.model.trim() || !form.price.trim()}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#111827] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {saving && (
-                <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
+          {/* Fotoğraf upload — öne çıkar */}
+          <div className="mb-5 rounded-xl border-2 border-dashed border-gray-200 bg-white p-4">
+            <p className="mb-3 text-[10px] font-bold uppercase tracking-wider text-gray-400">Fotoğraflar</p>
+            <div className="flex flex-wrap gap-2">
+              {newCarImages.map((url, i) => (
+                <div key={url} className="group/img relative h-20 w-28 overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+                  <img src={url} alt={`Foto ${i + 1}`} className="h-full w-full object-cover" />
+                  <button type="button" onClick={() => handleRemoveNewCarImage(url)}
+                    className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover/img:opacity-100 shadow">
+                    <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                      <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </button>
+                  {i === 0 && <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 py-0.5 text-[9px] font-bold text-white">Kapak</span>}
+                </div>
+              ))}
+              <label className={`relative flex h-20 w-28 cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-gray-300 text-gray-400 transition-all hover:border-[#111827] hover:text-[#111827] ${uploadingImage ? "opacity-50 pointer-events-none" : ""}`}>
+                <input type="file" accept="image/*" multiple className="absolute inset-0 cursor-pointer opacity-0"
+                  disabled={uploadingImage}
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files ?? []);
+                    files.forEach((f) => handleFileUpload(f));
+                    e.currentTarget.value = "";
+                  }} />
+                {uploadingImage ? (
+                  <svg className="h-6 w-6 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                ) : (
+                  <>
+                    <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                      <polyline points="17 8 12 3 7 8" />
+                      <line x1="12" y1="3" x2="12" y2="15" />
+                    </svg>
+                    <span className="text-[10px] font-bold">Foto ekle</span>
+                  </>
+                )}
+              </label>
+              {newCarImages.length === 0 && !uploadingImage && (
+                <div className="flex flex-col justify-center">
+                  <p className="text-[11px] text-gray-400">Birden fazla fotoğraf seçebilirsiniz.</p>
+                  <p className="text-[10px] text-gray-300">İlk fotoğraf kapak görseli olur.</p>
+                </div>
               )}
-              {saving ? "Kaydediliyor..." : "Kaydet"}
-            </button>
+            </div>
+            {uploadError && <p className="mt-2 text-xs font-medium text-red-500">{uploadError}</p>}
+          </div>
+
+          {/* Form grid */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {[
+              { key: "brand", label: "Marka", placeholder: "BMW", required: true },
+              { key: "model", label: "Model", placeholder: "320i M Sport", required: true },
+              { key: "year", label: "Yıl", placeholder: "2022", required: true },
+              { key: "price", label: "Fiyat (₺)", placeholder: "2.850.000", required: true },
+              { key: "km", label: "KM", placeholder: "22.000", required: true },
+            ].map(({ key, label, placeholder, required }) => (
+              <div key={key}>
+                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                  {label}{required && <span className="ml-0.5 text-red-400">*</span>}
+                </label>
+                <input type="text" value={form[key as keyof typeof form] as string}
+                  onChange={(e) => handleFormChange(key as keyof typeof form, e.target.value)}
+                  placeholder={placeholder}
+                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/10" />
+              </div>
+            ))}
+
+            {/* Select'ler */}
+            {[
+              { key: "fuel_type", label: "Yakıt", opts: [["Benzin","Benzin"],["Dizel","Dizel"],["Elektrik","Elektrik"],["Hibrit","Hibrit"],["LPG","LPG"]] },
+              { key: "transmission", label: "Vites", opts: [["Otomatik","Otomatik"],["Manuel","Manuel"],["Yarı Otomatik","Yarı Otomatik"]] },
+              { key: "segment", label: "Segment", opts: [["Kelepir","Fırsat"],["Orta Direk","Orta Segment"],["Premium","Premium"]] },
+              { key: "status", label: "Durum", opts: [["Aktif","Aktif"],["Kaporalandı","Kaporalandı"],["Satıldı","Satıldı"],["Yayından Kaldırıldı","Yayından Kaldırıldı"]] },
+            ].map(({ key, label, opts }) => (
+              <div key={key}>
+                <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">{label}</label>
+                <select value={form[key as keyof typeof form] as string}
+                  onChange={(e) => handleFormChange(key as keyof typeof form, e.target.value)}
+                  className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#111827] outline-none focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/10">
+                  {opts.map(([v, t]) => <option key={v} value={v}>{t}</option>)}
+                </select>
+              </div>
+            ))}
+
+            {/* Video URL — full width */}
+            <div className="col-span-2 sm:col-span-3 lg:col-span-4">
+              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">Video URL <span className="normal-case text-gray-300 font-normal">(opsiyonel)</span></label>
+              <input type="text" value={form.video_url}
+                onChange={(e) => handleFormChange("video_url", e.target.value)}
+                placeholder="https://... — SancakTok'ta oynatılır"
+                className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/10" />
+            </div>
+
+            {/* Ekspertiz — full width */}
+            <div className="col-span-2 sm:col-span-3 lg:col-span-4">
+              <label className="mb-2 block text-[10px] font-bold uppercase tracking-wider text-gray-500">Ekspertiz Durumu</label>
+              <AdminEkspertizPanel
+                value={form.ekspertiz_durumu}
+                onChange={(data) => setForm((prev) => ({ ...prev, ekspertiz_durumu: data }))}
+              />
+            </div>
+
+            {/* Esnaf Notu — full width */}
+            <div className="col-span-2 sm:col-span-3 lg:col-span-4">
+              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-gray-500">Esnaf Notu <span className="normal-case text-gray-300 font-normal">(opsiyonel)</span></label>
+              <textarea rows={2} value={form.esnaf_notu}
+                onChange={(e) => handleFormChange("esnaf_notu", e.target.value)}
+                placeholder="Araç hakkında özel not..."
+                className="w-full resize-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#111827] outline-none placeholder:text-gray-300 focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/10" />
+            </div>
+          </div>
+
+          {/* Alt: vitrin checkbox + kaydet */}
+          <div className="mt-4 flex items-center justify-between">
+            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm hover:border-amber-300 transition-colors">
+              <input type="checkbox" checked={form.is_featured}
+                onChange={(e) => { setForm((prev) => ({ ...prev, is_featured: e.target.checked })); setSaveError(null); }}
+                className="h-4 w-4 rounded border-gray-300 accent-amber-500" />
+              <span className="text-sm font-semibold text-gray-700 select-none">Vitrine çıkar</span>
+              <svg className="h-4 w-4 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            </label>
+
+            <div className="flex items-center gap-2">
+              {saveError && <p className="text-xs text-red-500">{saveError}</p>}
+              <button type="button" onClick={handleFormToggle}
+                className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-500 hover:bg-gray-50 transition-colors">
+                İptal
+              </button>
+              <button type="button" onClick={handleSave}
+                disabled={saving || !form.brand.trim() || !form.model.trim() || !form.year.trim() || !form.price.trim() || !form.km.trim()}
+                className="inline-flex items-center gap-2 rounded-xl bg-[#111827] px-5 py-2.5 text-sm font-bold text-white hover:bg-gray-800 transition-all active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed shadow-sm">
+                {saving && (
+                  <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                )}
+                {saving ? "Kaydediliyor..." : "Aracı Kaydet"}
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      {/* Edit Drawer */}
+      <AdminEditDrawer
+        car={editingCarId ? (vehicles.find((v) => v.id === editingCarId) ?? null) : null}
+        form={editForm}
+        saving={editingSaving}
+        error={editError}
+        addingImage={addingImageId !== null}
+        onClose={handleEditCancel}
+        onChange={handleEditChange}
+        onEkspertizChange={(data) => setEditForm((prev) => ({ ...prev, ekspertiz_durumu: data }))}
+        onSave={handleEditSave}
+        onAddImage={handleAddImage}
+        onRemoveImage={handleRemoveImage}
+      />
 
       {filteredCars.length === 0 ? (
         <div className="flex flex-col items-center gap-2 py-16 text-gray-400">
@@ -852,7 +802,7 @@ export default function AdminVehiclePanel() {
         </div>
       ) : (
       <>
-        <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 p-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {paginatedCars.map((car) => (
             <AdminVehicleCard
               key={car.id}
@@ -861,19 +811,12 @@ export default function AdminVehiclePanel() {
               isEditing={editingCarId === car.id}
               updatingFeaturedId={updatingFeaturedId}
               updatingHeroId={updatingHeroId}
-              editForm={editingCarId === car.id ? editForm : defaultForm}
-              editError={editError}
-              editingSaving={editingSaving}
-              uploadingImage={uploadingImage}
-              uploadSuccess={uploadSuccess}
+              deletingId={deletingId}
               onStatusChange={handleStatusChange}
               onFeaturedToggle={handleFeaturedToggle}
               onHeroToggle={handleHeroToggle}
               onEditClick={handleEditClick}
-              onEditCancel={handleEditCancel}
-              onEditChange={handleEditChange}
-              onEditSave={handleEditSave}
-              onFileUpload={handleEditFileUpload}
+              onDelete={handleDelete}
             />
           ))}
         </div>

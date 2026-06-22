@@ -187,22 +187,6 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
               sürede iletişime geçsin.
             </p>
 
-            {/* Guven / fayda rozetleri - 3 adet */}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              {[
-                { icon: "🛡️", label: "Ücretsiz ön değerlendirme" },
-                { icon: "🔄", label: "Takas imkânı" },
-                { icon: "💬", label: "WhatsApp ile hızlı dönüş" },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-gray-300 backdrop-blur-sm transition-colors hover:bg-white/10"
-                >
-                  <span className="text-sm">{item.icon}</span>
-                  <span>{item.label}</span>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>

@@ -26,6 +26,7 @@ const allStatuses: LeadStatus[] = [
 ];
 
 export default function AdminLeadPanel({ leads, onStatusChange, onNoteChange, onFollowUpChange, notificationFilter, onClearNotificationFilter }: AdminLeadPanelProps) {
+  const [openLeadId, setOpenLeadId] = useState<string | null>(leads.length > 0 ? leads[0].id : null);
   const [updatingLeadId, setUpdatingLeadId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<"Tümü" | LeadStatus>("Tümü");
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
@@ -106,6 +107,13 @@ export default function AdminLeadPanel({ leads, onStatusChange, onNoteChange, on
   /*  Filtre: notificationFilter → statusFilter/specialFilter senkronizasyonu  */
   /* ------------------------------------------------------------------------ */
   // notificationFilter parent'tan (LeadNotificationBar'dan) gelir.
+  // İlk lead'i otomatik aç
+  useEffect(() => {
+    if (leads.length > 0 && !openLeadId) {
+      setOpenLeadId(leads[0].id);
+    }
+  }, [leads, openLeadId]);
+
   // useEffect ile statusFilter/specialFilter ayarlanır, böylece
   // filteredLeads sadece statusFilter + specialFilter kombinasyonuna bakar
   const prevNotificationFilterRef = useRef(notificationFilter);
@@ -304,48 +312,31 @@ export default function AdminLeadPanel({ leads, onStatusChange, onNoteChange, on
   }
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-gray-100 px-5 py-3.5 sm:px-6">
-        <h2 className="text-sm font-bold text-[#111827]">Gelen Talepler</h2>
-        <span className="rounded-md bg-gray-50 px-2 py-0.5 text-[11px] font-mono text-gray-500 border border-gray-100">
-          {leads.length}
-        </span>
-      </div>
-      <div className="border-b border-gray-100 px-4 py-3">
-        <div className="flex flex-wrap gap-1.5">
-          {filterTabs.map((tab) => {
-            const active = statusFilter === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => { setStatusFilter(tab.key); onClearNotificationFilter?.(); }}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors ${
-                  active
-                    ? "border-[#111827] bg-[#111827] text-white shadow-sm"
-                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                {tab.label}
-                <span
-                  className={`inline-flex items-center justify-center rounded-full px-1.5 py-0 text-[10px] font-bold leading-tight ${
-                    active ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
-                  }`}
-                >
-                  {countByStatus[tab.key]}
-                </span>
-              </button>
-            );
-          })}
+    <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
+
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between border-b border-gray-100 bg-[#f8f9fb] px-5 py-4 sm:px-6">
+        <div>
+          <h2 className="text-base font-black text-[#111827]">Araç Alım Talepleri</h2>
+          <p className="mt-0.5 text-[11px] text-gray-400">
+            {leads.length} toplam · {countByStatus["Bekliyor"]} bekliyor
+            {countByStatus["Tekrar Aranacak"] > 0 && ` · ${countByStatus["Tekrar Aranacak"]} tekrar dönüş`}
+          </p>
+        </div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#111827] shadow-sm">
+          <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
         </div>
       </div>
-      {/* Arama çubuğu ve özel filtreler */}
-      <div className="border-b border-gray-100 px-4 py-3">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
+      {/* ── Arama + özel filtreler ── */}
+      <div className="border-b border-gray-100 px-4 py-3 sm:px-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <svg className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <circle cx="11" cy="11" r="8" />
-              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
             <input
               id={searchInputId}
@@ -353,29 +344,54 @@ export default function AdminLeadPanel({ leads, onStatusChange, onNoteChange, on
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="İsim, telefon, marka veya model ara..."
-              className="w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 py-2 text-[12px] text-gray-700 outline-none transition-colors focus:border-[#111827] placeholder:text-gray-400"
+              className="w-full rounded-lg border border-gray-200 bg-white pl-9 pr-3 py-2 text-sm text-gray-700 outline-none focus:border-[#111827] placeholder:text-gray-400"
             />
+            {searchQuery && (
+              <button type="button" onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-500 transition-colors">
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                  <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            )}
           </div>
           <div className="flex gap-1.5">
-            {(["Tümü", "Bugün", "Geciken"] as const).map((sf) => (
-              <button
-                key={sf}
-                type="button"
-                onClick={() => { setSpecialFilter(specialFilter === sf ? "Tümü" : sf); onClearNotificationFilter?.(); }}
-                className={`rounded-full border px-3 py-1 text-[10px] font-semibold transition-colors ${
-                  specialFilter === sf
-                    ? sf === "Bugün"
-                      ? "border-amber-400 bg-amber-50 text-amber-700"
-                      : sf === "Geciken"
-                      ? "border-red-400 bg-red-50 text-red-700"
-                      : "border-[#111827] bg-[#111827] text-white"
-                    : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:bg-gray-50"
-                }`}
-              >
-                {sf === "Tümü" ? "Tüm Zamanlar" : sf === "Bugün" ? "Bugün Dönüş Yapılacak" : "Gecikenler"}
+            {([
+              { key: "Bugün" as const, label: "Bugün", active: "border-amber-400 bg-amber-50 text-amber-700" },
+              { key: "Geciken" as const, label: "Gecikenler", active: "border-red-400 bg-red-50 text-red-600" },
+            ]).map((sf) => (
+              <button key={sf.key} type="button"
+                onClick={() => { setSpecialFilter(specialFilter === sf.key ? "Tümü" : sf.key); onClearNotificationFilter?.(); }}
+                className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold transition-colors ${
+                  specialFilter === sf.key ? sf.active : "border-gray-200 bg-white text-gray-500 hover:border-gray-300 hover:bg-gray-50"
+                }`}>
+                {sf.label}
               </button>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* ── Durum filtreleri ── */}
+      <div className="border-b border-gray-100 px-4 py-2.5 sm:px-5">
+        <div className="flex flex-wrap gap-1.5">
+          {filterTabs.map((tab) => {
+            const active = statusFilter === tab.key;
+            return (
+              <button key={tab.key} type="button"
+                onClick={() => { setStatusFilter(tab.key); onClearNotificationFilter?.(); }}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+                  active
+                    ? "border-[#111827] bg-[#111827] text-white shadow-sm"
+                    : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50"
+                }`}>
+                {tab.label}
+                <span className={`inline-flex min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-bold leading-tight ${active ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"}`}>
+                  {countByStatus[tab.key]}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
       {filteredLeads.length === 0 ? (
@@ -414,6 +430,8 @@ export default function AdminLeadPanel({ leads, onStatusChange, onNoteChange, on
               <AdminLeadCard
                 key={lead.id}
                 lead={lead}
+                isOpen={openLeadId === lead.id}
+                onToggle={(id) => setOpenLeadId((prev) => (prev === id ? null : id))}
                 isUpdating={isUpdating}
                 isTerminal={isTerminal}
                 editingNoteId={editingNoteId}

@@ -11,6 +11,9 @@ export function displayStatus(status: string): string {
 export type FuelType = "Benzin" | "Dizel" | "Elektrik" | "Hibrit" | "LPG";
 export type Transmission = "Manuel" | "Otomatik" | "Yarı Otomatik";
 
+export type EkspertizDurum = "Orijinal" | "Lokal Boyalı" | "Boyalı" | "Değişen";
+export type EkspertizData = Record<string, EkspertizDurum>;
+
 export interface Car {
   id: string;
   brand: string;
@@ -25,7 +28,7 @@ export interface Car {
   status: CarStatus;
   is_featured?: boolean;
   is_hero?: boolean;
-  ekspertiz_durumu?: string;
+  ekspertiz_durumu?: EkspertizData | null;
   fuel_type: FuelType;
   transmission: Transmission;
   created_at: string;

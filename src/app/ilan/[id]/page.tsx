@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import type { Car } from "@/types";
 import CarDetailClient from "./CarDetailClient";
 
+export const revalidate = 0;
+
 /* -------------------------------------------------------------------------- */
 /*  Server Component - Supabase'den veri ceker, client bilesene gonderir      */
 /* -------------------------------------------------------------------------- */
