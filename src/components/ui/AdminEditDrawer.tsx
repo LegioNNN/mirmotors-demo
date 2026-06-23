@@ -95,6 +95,7 @@ export default function AdminEditDrawer({
                   </>
                 )}
               </label>
+              <p className="self-end text-[10px] text-gray-300 pb-1"><kbd className="rounded bg-gray-100 px-1 font-mono text-[9px]">Ctrl+V</kbd> ile yapıştır</p>
             </div>
           </div>
 

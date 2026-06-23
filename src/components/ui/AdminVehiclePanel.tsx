@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Car } from "@/types";
 import AdminVehicleCard from "./AdminVehicleCard";
@@ -121,6 +121,28 @@ export default function AdminVehiclePanel() {
     }
   };
 
+  const handlePaste = useCallback((e: ClipboardEvent) => {
+    const items = Array.from(e.clipboardData?.items ?? []);
+    const imageItems = items.filter((item) => item.type.startsWith("image/"));
+    if (imageItems.length === 0) return;
+    if (formOpen) {
+      imageItems.forEach((item) => {
+        const file = item.getAsFile();
+        if (file) handleFileUpload(file);
+      });
+    } else if (editingCarId) {
+      imageItems.forEach((item) => {
+        const file = item.getAsFile();
+        if (file) handleAddImage(editingCarId, file);
+      });
+    }
+  }, [formOpen, editingCarId]);
+
+  useEffect(() => {
+    document.addEventListener("paste", handlePaste);
+    return () => document.removeEventListener("paste", handlePaste);
+  }, [handlePaste]);
+
   const handleRemoveNewCarImage = (url: string) => {
     setNewCarImages((prev) => prev.filter((u) => u !== url));
   };
@@ -129,10 +151,12 @@ export default function AdminVehiclePanel() {
     setAddingImageId(carId);
     try {
       const publicUrl = await uploadCarImage(file);
-      const car = vehicles.find((v) => v.id === carId);
-      const newImages = [...(car?.images ?? []), publicUrl];
-      const { error: err } = await supabase.from("cars").update({ images: newImages }).eq("id", carId);
-      if (!err) setVehicles((prev) => prev.map((c) => c.id === carId ? { ...c, images: newImages } : c));
+      setVehicles((prev) => {
+        const car = prev.find((v) => v.id === carId);
+        const newImages = [...(car?.images ?? []), publicUrl];
+        supabase.from("cars").update({ images: newImages }).eq("id", carId).then(() => {});
+        return prev.map((c) => c.id === carId ? { ...c, images: newImages } : c);
+      });
     } catch {
       // silent — user can retry
     } finally {
@@ -141,10 +165,12 @@ export default function AdminVehiclePanel() {
   };
 
   const handleRemoveImage = async (carId: string, imageUrl: string) => {
-    const car = vehicles.find((v) => v.id === carId);
-    const newImages = (car?.images ?? []).filter((u) => u !== imageUrl);
-    const { error: err } = await supabase.from("cars").update({ images: newImages }).eq("id", carId);
-    if (!err) setVehicles((prev) => prev.map((c) => c.id === carId ? { ...c, images: newImages } : c));
+    setVehicles((prev) => {
+      const car = prev.find((v) => v.id === carId);
+      const newImages = (car?.images ?? []).filter((u) => u !== imageUrl);
+      supabase.from("cars").update({ images: newImages }).eq("id", carId).then(() => {});
+      return prev.map((c) => c.id === carId ? { ...c, images: newImages } : c);
+    });
   };
 
   const handleDelete = async (carId: string) => {
@@ -672,6 +698,7 @@ export default function AdminVehiclePanel() {
                 <div className="flex flex-col justify-center">
                   <p className="text-[11px] text-gray-400">Birden fazla fotoğraf seçebilirsiniz.</p>
                   <p className="text-[10px] text-gray-300">İlk fotoğraf kapak görseli olur.</p>
+                  <p className="text-[10px] text-gray-300 mt-0.5">Kopyalanan görseli <kbd className="rounded bg-gray-100 px-1 font-mono text-[9px]">Ctrl+V</kbd> ile yapıştırabilirsiniz.</p>
                 </div>
               )}
             </div>

@@ -38,8 +38,8 @@ function PhotoGrid({ car }: { car: Car }) {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={bot} alt="" className="h-full w-full object-cover" loading="eager" />
           {allImgs.length > 2 && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-              <span className="text-2xl font-black text-white">+{allImgs.length - 2}</span>
+            <div className="absolute bottom-2 right-2 rounded-md bg-black/60 px-2 py-0.5 backdrop-blur-sm">
+              <span className="text-sm font-black text-white">+{allImgs.length - 2}</span>
             </div>
           )}
         </div>
@@ -224,11 +224,6 @@ export default function SancakTokModal({ open, onClose, cars, initialIndex = 0 }
             <span className="text-base font-semibold text-white/80">{car.transmission}</span>
           </div>
 
-          {car.esnaf_notu && (
-            <p className="mt-2 text-xs italic leading-relaxed text-gray-400 line-clamp-2">
-              &ldquo;{car.esnaf_notu}&rdquo;
-            </p>
-          )}
 
           <p className="mt-3 text-4xl font-black tracking-tight text-amber-400">
             {car.price > 0 ? `${fmt(car.price)} ₺` : "Fiyat için ara"}
