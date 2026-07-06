@@ -7,6 +7,7 @@ import type { Car, CarSegment } from "@/types";
 import { createKaporaLink } from "@/utils/whatsappBalancer";
 import { getCarImage } from "@/utils/carImages";
 import { trackWhatsappClick } from "@/utils/trackWhatsappClick";
+import { brand } from "@/config/brand";
 
 /* -------------------------------------------------------------------------- */
 /*  Segment config                                                             */
@@ -69,7 +70,7 @@ export default function CarCard({ car }: CarCardProps) {
     e.stopPropagation();
     const result = await createKaporaLink(car.brand, car.model, car.year);
     if (result) {
-      const message = `Selamın aleyküm Sancaktar Otomotiv, sitenizdeki ${car.brand} ${car.model} ${car.year} ilanı için kapora gönderip aracı ayırtmak istiyorum. Hesap numarası alabilir miyim?`;
+      const message = `Selamın aleyküm ${brand.name}, sitenizdeki ${car.brand} ${car.model} ${car.year} ilanı için kapora gönderip aracı ayırtmak istiyorum. Hesap numarası alabilir miyim?`;
       trackWhatsappClick({
         car_id: car.id,
         car_brand: car.brand,

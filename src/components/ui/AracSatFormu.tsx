@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { LeadBuying } from "@/types";
+import { brand } from "@/config/brand";
 import StepIndicator from "@/components/arac-sat/StepIndicator";
 import Step1AracBilgileri from "@/components/arac-sat/Step1AracBilgileri";
 import Step2DurumBilgileri from "@/components/arac-sat/Step2DurumBilgileri";
@@ -137,6 +138,26 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
 
     if (!err && data) {
       onAddLead?.(data as LeadBuying);
+      // Email bildirimi gönder — fire-and-forget, hata olursa sessizce geç
+      fetch("/api/notify-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name: adSoyad.trim(),
+          phone: telefon.trim(),
+          brand: marka,
+          model: model,
+          year: yil ?? 2020,
+          expected_price: fiyat as number,
+          km: km.trim() || undefined,
+          city: sehir.trim() || undefined,
+          district: ilce.trim() || undefined,
+          extra_note: combinedNote || undefined,
+          contact_preference: iletisimTercihi,
+          has_tramer: tramer,
+          wants_trade: takas,
+        }),
+      }).catch(() => {});
     }
 
     setSubmitting(false);
@@ -170,7 +191,7 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              İstanbul Galeri &mdash; 750+ Araçlık Stok
+              {brand.city} Galeri &mdash; {brand.stockText}
             </div>
 
             {/* Baslik */}
@@ -183,9 +204,10 @@ export default function AracSatFormu({ onAddLead }: AracSatFormuProps) {
 
             {/* Alt metin */}
             <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-gray-300 sm:text-lg">
-              Araç bilgilerinizi bırakın, Sancaktar alım ekibi sizinle kısa
+              Araç bilgilerinizi bırakın, {brand.shortName} alım ekibi sizinle kısa
               sürede iletişime geçsin.
             </p>
+
 
           </div>
         </div>

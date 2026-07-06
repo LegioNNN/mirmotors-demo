@@ -1,5 +1,7 @@
 "use client";
 
+import { brand } from "@/config/brand";
+
 /* ======================================================================== */
 /*  Step4Iletisim - Adim 4: Iletisim ve Onay                                 */
 /*  Ad soyad, telefon, sehir/ilce, iletisim tercihi, KVKK, gonderim         */
@@ -241,7 +243,7 @@ export default function Step4Iletisim({
         <label htmlFor="step4-kvkk" className="cursor-pointer text-xs leading-relaxed text-gray-600">
           <span className="font-semibold text-red-500">*</span>{" "}
           <span className="font-medium">KVKK Onayı:</span> Kişisel
-          verilerimin Sancaktar Otomotiv tarafından araç alım
+          verilerimin {brand.name} tarafından araç alım
           değerlendirmesi kapsamında işlenmesini kabul ediyorum.
         </label>
       </div>

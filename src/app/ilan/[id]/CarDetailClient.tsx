@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import type { Car } from "@/types";
+import { brand } from "@/config/brand";
 import { createKaporaLink } from "@/utils/whatsappBalancer";
 import { getCarImage } from "@/utils/carImages";
 import { trackWhatsappClick } from "@/utils/trackWhatsappClick";
@@ -35,7 +36,7 @@ export default function CarDetailClient({ car }: Props) {
     setWpLoading(false);
     if (result) {
       // Tracking - yönlendirmeyi engellemez
-      const message = `Merhaba Sancaktar Otomotiv, sitenizdeki ${car.brand} ${car.model} ${car.year} ilanıyla ilgileniyorum.`;
+      const message = `Merhaba ${brand.name}, sitenizdeki ${car.brand} ${car.model} ${car.year} ilanıyla ilgileniyorum.`;
       trackWhatsappClick({
         car_id: car.id,
         car_brand: car.brand,
@@ -67,7 +68,7 @@ export default function CarDetailClient({ car }: Props) {
       <MobileWhatsappBar car={car} onClick={handleWpMobile} loading={wpLoading} />
       <div className="mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:px-8 lg:pb-12">
         <nav className="mb-6 flex min-w-0 items-center gap-1.5 text-xs overflow-hidden">
-          <Link href="/" className="shrink-0 font-medium text-gray-400 transition-colors hover:text-[#111827]">Sancaktar</Link>
+          <Link href="/" className="shrink-0 font-medium text-gray-400 transition-colors hover:text-[#111827]">{brand.shortName}</Link>
           <svg className="h-3 w-3 shrink-0 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="9 18 15 12 9 6" /></svg>
           <Link href="/" className="shrink-0 font-medium text-gray-400 transition-colors hover:text-[#111827]">Vitrin</Link>
           <svg className="h-3 w-3 shrink-0 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="9 18 15 12 9 6" /></svg>
@@ -111,8 +112,8 @@ export default function CarDetailClient({ car }: Props) {
             {car.esnaf_notu && (
               <div className="mt-3 rounded-xl border border-amber-200/60 bg-amber-50 p-3">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[9px] font-black text-amber-800">AN</div>
-                  <span className="text-[11px] font-bold text-amber-900">Anıl&apos;ın Notu</span>
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[9px] font-black text-amber-800">{brand.owner.initials}</div>
+                  <span className="text-[11px] font-bold text-amber-900">{brand.owner.noteLabel}</span>
                 </div>
                 <p className="text-xs leading-relaxed text-amber-900">{car.esnaf_notu}</p>
               </div>
@@ -142,7 +143,7 @@ export default function CarDetailClient({ car }: Props) {
         </div>
       </div>
       <footer className="hidden lg:block mt-12 border-t border-gray-200 py-6 text-center text-xs text-gray-400">
-        <p>Sancaktar Otomotiv &copy; {new Date().getFullYear()} &mdash; 750 Araclik Vitrin</p>
+        <p>{brand.name} &copy; {new Date().getFullYear()} &mdash; {brand.description}</p>
       </footer>
     </main>
   );

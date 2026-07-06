@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import AdminShell from "./_components/AdminShell";
 import AdminAuthScreen from "./_components/AdminAuthScreen";
+import { brand } from "@/config/brand";
 
-const AUTH_KEY = "sancaktar_admin_auth";
+const AUTH_KEY = brand.adminAuthKey;
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);

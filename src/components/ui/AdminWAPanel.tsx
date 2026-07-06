@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import type { WhatsappNumber } from "@/types";
+import { brand } from "@/config/brand";
 
 const inputClass = "w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-[#111827] placeholder-gray-400 outline-none focus:border-[#111827] focus:ring-1 focus:ring-[#111827]/10";
 
@@ -24,11 +25,10 @@ export default function AdminWAPanel() {
       fetchNumbers().then(() => {
         supabase.from("whatsapp_numbers").select("*").then(({ data: nums }) => {
           if (!nums || nums.length === 0) {
-            const defaults = [
-              { phone_number: "5019443734", employee_name: "Anıl" },
-              { phone_number: "5015956737", employee_name: "Osman" },
-              { phone_number: "5310320250", employee_name: "İbrahim" },
-            ];
+            const defaults = brand.phones.map(p => ({
+              phone_number: p.number,
+              employee_name: p.label,
+            }));
             Promise.all(
               defaults.map(d =>
                 supabase.from("whatsapp_numbers").insert({
@@ -186,14 +186,14 @@ export default function AdminWAPanel() {
           <div>
             <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-gray-500">Çalışan Adı</label>
             <input type="text" value={newName} onChange={(e) => { setNewName(e.target.value); setAddError(null); }}
-              placeholder="Örn: Anıl Sancaktar"
+              placeholder={`Örn: ${brand.owner.name}`}
               className={inputClass} />
           </div>
           <div>
             <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-gray-500">Telefon (başında 90)</label>
             <input type="text" inputMode="numeric" value={newPhone}
               onChange={(e) => { setNewPhone(e.target.value.replace(/[^0-9]/g, "")); setAddError(null); }}
-              placeholder="905019443734"
+              placeholder={brand.phones[0]?.number ?? "905XXXXXXXXX"}
               className={inputClass} />
           </div>
         </div>
@@ -210,7 +210,7 @@ export default function AdminWAPanel() {
       <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50 to-violet-50/50 p-5 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-sm font-bold text-[#111827]">🤖 SancakBot — AI Asistan</h3>
+            <h3 className="text-sm font-bold text-[#111827]">🤖 {brand.shortName}Bot — AI Asistan</h3>
             <p className="mt-0.5 text-xs text-gray-600">Claude AI tarafından yönetilen 24/7 müşteri asistanı</p>
           </div>
           <div className="text-3xl">🤖</div>
@@ -221,7 +221,7 @@ export default function AdminWAPanel() {
           <div className="rounded-lg bg-white border border-violet-100 p-3">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-violet-700">WhatsApp Numarası</p>
             <p className="mt-1.5 font-mono text-sm font-bold text-[#111827]">+90 XXX XXX XX XX</p>
-            <p className="mt-1 text-xs text-gray-600">Müşteriler SancakBot'a mesaj atabilir</p>
+            <p className="mt-1 text-xs text-gray-600">Müşteriler {brand.shortName}Bot'a mesaj atabilir</p>
           </div>
 
           {/* Yetenekler */}
@@ -258,7 +258,7 @@ export default function AdminWAPanel() {
           {/* Sistem Bilgisi */}
           <div className="rounded-lg bg-gradient-to-r from-violet-100 to-violet-50 border border-violet-200 p-3">
             <p className="text-[10px] font-semibold text-violet-700">
-              ✨ SancakBot, müşteri servisinde yapılan işlerin önemli bir kısmını otomatikleştirerek takımı desteğiyle çalışır. AI her soruya cevap verir, gerekirse elemanlara yönlendirir.
+              ✨ {brand.shortName}Bot, müşteri servisinde yapılan işlerin önemli bir kısmını otomatikleştirerek takımı desteğiyle çalışır. AI her soruya cevap verir, gerekirse elemanlara yönlendirir.
             </p>
           </div>
         </div>

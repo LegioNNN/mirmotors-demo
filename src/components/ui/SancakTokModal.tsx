@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import type { Car } from "@/types";
 import { getCarImage } from "@/utils/carImages";
 import { generateWhatsAppUrl } from "@/utils/whatsappBalancer";
+import { brand } from "@/config/brand";
 
 interface Props {
   open: boolean;
@@ -131,7 +132,7 @@ export default function SancakTokModal({ open, onClose, cars, initialIndex = 0 }
 
   const handleWp = useCallback(() => {
     if (!car) return;
-    window.open(generateWhatsAppUrl("905019443734", car.brand, car.model, car.year), "_blank", "noopener,noreferrer");
+    window.open(generateWhatsAppUrl(brand.primaryPhone.replace("+", ""), car.brand, car.model, car.year), "_blank", "noopener,noreferrer");
   }, [car]);
 
   const handleDetail = useCallback(() => {

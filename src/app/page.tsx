@@ -11,6 +11,7 @@ import SancakTokModal from "@/components/ui/SancakTokModal";
 import NotificationSubscribeModal from "@/components/NotificationSubscribeModal";
 import AracSatFormu from "@/components/ui/AracSatFormu";
 import type { Car, CarSegment } from "@/types";
+import { brand } from "@/config/brand";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<"vitrin" | "sat">("vitrin");
@@ -131,7 +132,7 @@ export default function Home() {
       {activeTab === "vitrin" && (
         <>
           {/* ================================================================ */}
-          {/* HERO — koyu, temiz, araç odaklı                                  */}
+          {/* HERO                                                              */}
           {/* ================================================================ */}
           <section className="bg-[#111827]">
             <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
@@ -144,16 +145,16 @@ export default function Home() {
                     <svg className="h-3.5 w-3.5 shrink-0 text-green-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                     </svg>
-                    <span className="truncate">Büyükçekmece · Yetki Belge No: 3407136</span>
+                    <span className="truncate">{brand.district} · Yetki Belge No: {brand.licenseNo}</span>
                   </div>
 
                   <h1 className="text-4xl font-black tracking-tight sm:text-5xl lg:text-[3.25rem] leading-[1.1]">
-                    <span className="hero-shimmer">Sancaktar</span>{" "}
-                    <span className="hero-shimmer-sub font-bold">Otomotiv</span>
+                    <span className="hero-shimmer">{brand.shortName}</span>{" "}
+                    <span className="hero-shimmer-sub font-bold">{brand.tagline}</span>
                   </h1>
 
                   <p className="mt-4 text-base text-gray-400 leading-relaxed max-w-lg">
-                    İstanbul'da 750'yi aşkın araçlık stok. 50 bin TL'den 1 milyon TL'ye kadar her bütçeye uygun seçenek, hızlı WhatsApp iletişimi, takas imkânı.
+                    {brand.city}&apos;da {brand.description.toLowerCase()} stok. Her bütçeye uygun seçenek, hızlı WhatsApp iletişimi, takas imkânı.
                   </p>
 
                   <div className="mt-6 flex flex-wrap gap-3">
@@ -190,7 +191,7 @@ export default function Home() {
             <section className="border-b border-gray-800 bg-[#0f1623]" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
               <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-2 pb-3">
                 <p className="text-center text-xs font-black tracking-widest" style={{ color: "#e8c97a", fontFamily: "'Space Grotesk', 'Poppins', sans-serif", letterSpacing: "0.08em" }}>
-                  "Vira Bismillah"
+                  &ldquo;{brand.motto}&rdquo;
                 </p>
               </div>
               <div ref={statRowRef} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -211,13 +212,13 @@ export default function Home() {
           <section id="arac-listesi" className="mx-auto max-w-7xl px-4 pb-12 pt-10 sm:px-6 lg:px-8">
             {/* Başlık */}
             <div className="mb-4">
-              <h2 className="text-2xl font-black tracking-tight text-[#111827]">Sancaktar Vitrini</h2>
+              <h2 className="text-2xl font-black tracking-tight text-[#111827]">{brand.shortName} Vitrini</h2>
               {!loading && (
                 <p className="mt-1 text-sm text-gray-500">{filteredCars.length} araç listeleniyor</p>
               )}
             </div>
 
-            {/* Kontroller — mobilde sticky bar gibi */}
+            {/* Kontroller */}
             {!loading && (
               <div className="mb-5 flex items-center gap-2">
                 {/* Mobil: Filtrele butonu */}
@@ -247,25 +248,23 @@ export default function Home() {
                   <option value="price_desc">Fiyat ↓</option>
                 </select>
 
-                {/* SancakTok — TikTok hissi */}
+                {/* GaleriTok */}
                 <button
                   type="button"
                   onClick={() => openTok(0)}
                   className="ml-auto relative flex items-center gap-2 overflow-hidden rounded-xl px-4 py-2.5 text-sm font-black text-white shadow-md active:scale-[0.97] transition-transform"
                   style={{ background: "linear-gradient(135deg, #010101 0%, #1a1a2e 50%, #010101 100%)" }}
                 >
-                  {/* TikTok renk efekti — kırmızı/mavi shift */}
                   <span className="pointer-events-none absolute inset-0 flex items-center justify-center">
                     <span className="absolute h-full w-full opacity-20" style={{ background: "radial-gradient(ellipse at 30% 50%, #ff0050 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, #00f2ea 0%, transparent 60%)" }} />
                   </span>
                   <span className="relative flex items-center gap-2">
-                    {/* S harfi — TikTok renk shift efekti */}
                     <span className="relative flex h-5 w-5 shrink-0 items-center justify-center">
-                      <span className="absolute text-base font-black translate-x-[1.5px] translate-y-[0.5px]" style={{ color: "#00f2ea" }}>S</span>
-                      <span className="absolute text-base font-black -translate-x-[1.5px] -translate-y-[0.5px]" style={{ color: "#ff0050", opacity: 0.8 }}>S</span>
-                      <span className="relative text-base font-black text-white">S</span>
+                      <span className="absolute text-base font-black translate-x-[1.5px] translate-y-[0.5px]" style={{ color: "#00f2ea" }}>{brand.tok.letter}</span>
+                      <span className="absolute text-base font-black -translate-x-[1.5px] -translate-y-[0.5px]" style={{ color: "#ff0050", opacity: 0.8 }}>{brand.tok.letter}</span>
+                      <span className="relative text-base font-black text-white">{brand.tok.letter}</span>
                     </span>
-                    <span className="tracking-tight">ancakTok</span>
+                    <span className="tracking-tight">{brand.tok.label}</span>
                     <span className="rounded-md bg-white/15 px-1.5 py-0.5 text-[10px] font-bold tabular-nums">
                       {tokCars.length}
                     </span>
@@ -340,7 +339,7 @@ export default function Home() {
                 <div>
                   <h2 className="text-2xl font-black text-white">Aracınızı Satın veya Takas Edin</h2>
                   <p className="mt-2 text-sm text-gray-400 max-w-lg">
-                    Bilgilerinizi bırakın, ekibimiz kısa sürede WhatsApp'tan dönüş yapsın. Ücretsiz, taahhütsüz.
+                    Bilgilerinizi bırakın, ekibimiz kısa sürede WhatsApp&apos;tan dönüş yapsın. Ücretsiz, taahhütsüz.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-4 text-xs text-gray-500">
                     <span className="flex items-center gap-1.5">
@@ -375,17 +374,17 @@ export default function Home() {
             <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
               <div className="mb-8">
                 <span className="text-xs font-bold uppercase tracking-widest text-gray-400">Kurumsal</span>
-                <h2 className="mt-1 text-2xl font-black text-[#111827]">Sancaktar Otomotiv Hakkında</h2>
+                <h2 className="mt-1 text-2xl font-black text-[#111827]">{brand.name} Hakkında</h2>
               </div>
 
               <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-                {/* Sol — Anıl kartı */}
+                {/* Sol — Yetkili kartı */}
                 <div className="lg:col-span-4 order-1 lg:order-none">
                   <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                     <div className="relative h-64 w-full bg-gray-100 overflow-hidden">
                       <img
-                        src="/anil-sancaktar.png"
-                        alt="Anıl Sancaktar"
+                        src={brand.owner.photo}
+                        alt={brand.owner.name}
                         className="h-full w-full object-cover object-top"
                         onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                       />
@@ -393,35 +392,35 @@ export default function Home() {
                     <div className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-black text-[#111827]">Anıl Sancaktar</h3>
-                          <p className="text-xs font-semibold text-green-700 mt-0.5">Sancaktar Otomotiv Yetkilisi</p>
+                          <h3 className="font-black text-[#111827]">{brand.owner.name}</h3>
+                          <p className="text-xs font-semibold text-green-700 mt-0.5">{brand.owner.title}</p>
                         </div>
                         <span className="inline-flex items-center gap-1 rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-extrabold text-amber-800">
                           <svg className="h-3 w-3 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                           </svg>
-                          1991
+                          {brand.owner.since}
                         </span>
                       </div>
                       {/* Kişisel Instagram */}
-                      <a href="https://www.instagram.com/anilsancaktar" target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-100 px-3 py-2 hover:bg-gray-100 transition-colors">
+                      <a href={brand.owner.instagramUrl} target="_blank" rel="noopener noreferrer" className="mt-3 flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-100 px-3 py-2 hover:bg-gray-100 transition-colors">
                         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-pink-500 via-purple-500 to-orange-400 text-white">
                           <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
                           </svg>
                         </div>
                         <div>
-                          <p className="text-xs font-bold text-gray-800">@anilsancaktar</p>
-                          <p className="text-[10px] text-gray-400">128B takipçi</p>
+                          <p className="text-xs font-bold text-gray-800">{brand.owner.instagramHandle}</p>
+                          <p className="text-[10px] text-gray-400">{brand.owner.instagramFollowers} takipçi</p>
                         </div>
                       </a>
                     </div>
                   </div>
 
-                  {/* Butonlar — Anıl kartının altında */}
+                  {/* Butonlar */}
                   <div className="mt-4 flex flex-col gap-2">
                     <a
-                      href="https://maps.app.goo.gl/USRs34mY3L6xNjT86"
+                      href={brand.mapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
@@ -432,7 +431,7 @@ export default function Home() {
                       Galeri Konumuna Git
                     </a>
                     <a
-                      href="https://sancaktaroto.sahibinden.com"
+                      href={brand.social.sahibinden}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
@@ -451,10 +450,10 @@ export default function Home() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <SocialCard
                       platform="Instagram"
-                      handle="@sancaktar_otomtiv"
-                      sub="Motorlu Araç Şirketi"
-                      href="https://www.instagram.com/sancaktar_otomtiv"
-                      stats={[{ val: "363", lbl: "gönderi" }, { val: "876B", lbl: "takipçi" }]}
+                      handle={brand.social.instagram.handle}
+                      sub={brand.social.instagram.sub}
+                      href={brand.social.instagram.url}
+                      stats={[{ val: brand.social.instagram.posts, lbl: "gönderi" }, { val: brand.social.instagram.followers, lbl: "takipçi" }]}
                       iconBg="bg-gradient-to-br from-pink-500 via-purple-500 to-orange-400"
                       icon={
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -464,10 +463,10 @@ export default function Home() {
                     />
                     <SocialCard
                       platform="TikTok"
-                      handle="Sancaktar Otomotiv"
-                      sub="@sancaktar.otomoti"
-                      href="https://www.tiktok.com/@sancaktar.otomoti"
-                      stats={[{ val: "134.6K", lbl: "takipçi" }, { val: "431.2K", lbl: "beğeni" }]}
+                      handle={brand.social.tiktok.displayName}
+                      sub={brand.social.tiktok.handle}
+                      href={brand.social.tiktok.url}
+                      stats={[{ val: brand.social.tiktok.followers, lbl: "takipçi" }, { val: brand.social.tiktok.likes, lbl: "beğeni" }]}
                       iconBg="bg-[#121212]"
                       icon={
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -477,10 +476,10 @@ export default function Home() {
                     />
                     <SocialCard
                       platform="Facebook"
-                      handle="Anıl Sancaktar"
-                      sub="Sancaktar Otomotiv"
-                      href="https://www.facebook.com/profile.php?id=606617411"
-                      stats={[{ val: "678B", lbl: "takipçi" }]}
+                      handle={brand.social.facebook.handle}
+                      sub={brand.social.facebook.sub}
+                      href={brand.social.facebook.url}
+                      stats={[{ val: brand.social.facebook.followers, lbl: "takipçi" }]}
                       iconBg="bg-[#1877F2]"
                       icon={
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -490,10 +489,10 @@ export default function Home() {
                     />
                     <SocialCard
                       platform="Kanal"
-                      handle="Sancaktar Otomotiv"
+                      handle={brand.name}
                       sub="WhatsApp Kanalı"
-                      href="https://www.whatsapp.com/channel/0029Vb7jgOWICVfi8h0kLv2w"
-                      stats={[{ val: "152B", lbl: "takipçi" }]}
+                      href={brand.social.whatsappChannel.url}
+                      stats={[{ val: brand.social.whatsappChannel.followers, lbl: "takipçi" }]}
                       iconBg="bg-[#25D366]"
                       icon={
                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
@@ -508,12 +507,12 @@ export default function Home() {
                     <InfoRow
                       icon={<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />}
                       label="Yetki Belge No"
-                      value="3407136"
+                      value={brand.licenseNo}
                     />
                     <InfoRow
                       icon={<><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" /></>}
                       label="Adres"
-                      value="Türkoba Mah. Bağlar 1. Cd. No:59, Büyükçekmece / İstanbul"
+                      value={brand.address}
                     />
                     <div className="flex items-start gap-3 px-4 py-3">
                       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
@@ -524,16 +523,16 @@ export default function Home() {
                       <div>
                         <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Telefon</p>
                         <div className="mt-0.5 space-y-0.5">
-                          <a href="tel:+905019443734" className="block text-sm font-semibold text-gray-700 hover:text-[#111827]">0501 944 37 34</a>
-                          <a href="tel:+905015956737" className="block text-sm font-semibold text-gray-700 hover:text-[#111827]">0501 595 67 37</a>
-                          <a href="tel:+905310320250" className="block text-sm font-semibold text-gray-700 hover:text-[#111827]">0531 032 02 50</a>
+                          {brand.phones.map((p) => (
+                            <a key={p.number} href={`tel:+9${p.number}`} className="block text-sm font-semibold text-gray-700 hover:text-[#111827]">{p.display}</a>
+                          ))}
                         </div>
                       </div>
                     </div>
                     <InfoRow
                       icon={<><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></>}
                       label="Çalışma Saatleri"
-                      value="Her gün 09:00 – 20:00"
+                      value={brand.workingHours}
                     />
                   </div>
 
@@ -554,11 +553,11 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {/* Marka */}
             <div className="sm:col-span-2">
-              <img src="/sancaktar-logo-yatay-koyu.svg" alt="Sancaktar Otomotiv" className="h-9 w-auto" />
+              <img src={brand.logos.horizontalDark} alt={brand.name} className="h-9 w-auto" />
               <p className="mt-4 text-sm text-gray-500 max-w-xs">
-                Büyükçekmece'de geniş stok, dürüst esnaf notu, hızlı iletişim.
+                {brand.district}&apos;de geniş stok, dürüst esnaf notu, hızlı iletişim.
               </p>
-              <p className="mt-2 text-xs text-gray-600">Yetki Belge No: 3407136</p>
+              <p className="mt-2 text-xs text-gray-600">Yetki Belge No: {brand.licenseNo}</p>
             </div>
 
             {/* Hızlı linkler */}
@@ -581,7 +580,7 @@ export default function Home() {
                   </button>
                 </li>
                 <li>
-                  <a href="https://sancaktaroto.sahibinden.com" target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 hover:text-white transition-colors">
+                  <a href={brand.social.sahibinden} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 hover:text-white transition-colors">
                     Sahibinden
                   </a>
                 </li>
@@ -592,17 +591,19 @@ export default function Home() {
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-gray-400">İletişim</p>
               <ul className="mt-4 space-y-2.5">
-                <li><a href="tel:+905019443734" className="text-sm text-gray-500 hover:text-white transition-colors">0501 944 37 34</a></li>
-                <li><a href="tel:+905015956737" className="text-sm text-gray-500 hover:text-white transition-colors">0501 595 67 37</a></li>
-                <li><a href="tel:+905310320250" className="text-sm text-gray-500 hover:text-white transition-colors">0531 032 02 50</a></li>
+                {brand.phones.map((p) => (
+                  <li key={p.number}>
+                    <a href={`tel:+9${p.number}`} className="text-sm text-gray-500 hover:text-white transition-colors">{p.display}</a>
+                  </li>
+                ))}
                 <li className="pt-1">
                   <a
-                    href="https://maps.app.goo.gl/USRs34mY3L6xNjT86"
+                    href={brand.mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm text-gray-500 hover:text-white transition-colors"
                   >
-                    Büyükçekmece / İstanbul
+                    {brand.district} / {brand.city}
                   </a>
                 </li>
               </ul>
@@ -637,7 +638,7 @@ export default function Home() {
               </button>
               <span className="text-gray-700 text-xs">·</span>
               <a
-                href="https://wa.me/905551712526?text=Merhaba%2C%20sancaktarotomotiv.com%20hakk%C4%B1nda%20bir%20%C3%B6neri%2Fsikayet%20iletmek%20istiyorum."
+                href={`https://wa.me/${brand.feedbackWhatsapp}?text=Merhaba%2C%20sitemiz%20hakk%C4%B1nda%20bir%20%C3%B6neri%2Fsikayet%20iletmek%20istiyorum.`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-gray-500 hover:text-gray-300 transition-colors underline underline-offset-2"
@@ -646,8 +647,8 @@ export default function Home() {
               </a>
             </div>
             <p className="text-center text-xs text-gray-600">
-              © {new Date().getFullYear()} Sancaktar Otomotiv. Tüm hakları saklıdır.
-              &nbsp;·&nbsp; Yetki Belge No: 3407136 &nbsp;·&nbsp; Büyükçekmece / İstanbul
+              © {new Date().getFullYear()} {brand.name}. Tüm hakları saklıdır.
+              &nbsp;·&nbsp; Yetki Belge No: {brand.licenseNo} &nbsp;·&nbsp; {brand.district} / {brand.city}
             </p>
           </div>
         </div>
@@ -666,12 +667,12 @@ export default function Home() {
             </button>
           </div>
           <div className="max-h-[60vh] overflow-y-auto px-5 py-4 text-xs leading-relaxed text-gray-600 space-y-3">
-            <p><strong className="text-gray-800">Veri Sorumlusu:</strong> Sancaktar Otomotiv, Büyükçekmece / İstanbul — Yetki Belge No: 3407136</p>
+            <p><strong className="text-gray-800">Veri Sorumlusu:</strong> {brand.name}, {brand.district} / {brand.city} — Yetki Belge No: {brand.licenseNo}</p>
             <p><strong className="text-gray-800">Kişisel Verilerin İşlenme Amacı:</strong> Aracınızın alım/satım sürecinde sizinle iletişime geçilmesi, teklif hazırlanması ve yasal yükümlülüklerin yerine getirilmesi amacıyla ad-soyad, telefon numarası ve araç bilgileriniz işlenmektedir.</p>
             <p><strong className="text-gray-800">Hukuki Dayanak:</strong> 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında açık rızanıza ve sözleşme kurulması amacına dayalı olarak verileriniz işlenmektedir.</p>
             <p><strong className="text-gray-800">Veri Aktarımı:</strong> Kişisel verileriniz üçüncü kişilerle paylaşılmaz. Yasal zorunluluk durumunda ilgili kamu kurumlarıyla paylaşılabilir.</p>
             <p><strong className="text-gray-800">Saklama Süresi:</strong> Verileriniz, ilgili işlem tamamlandıktan sonra yasal süreler (genellikle 10 yıl) dahilinde saklanır, ardından silinir.</p>
-            <p><strong className="text-gray-800">Haklarınız:</strong> KVKK Madde 11 kapsamında kişisel verilerinize erişim, düzeltme, silme, işlemenin kısıtlanması ve itiraz haklarına sahipsiniz. Talepleriniz için <a href="tel:+905019443734" className="text-emerald-600 underline">0501 944 37 34</a> numaralı hattı arayabilirsiniz.</p>
+            <p><strong className="text-gray-800">Haklarınız:</strong> KVKK Madde 11 kapsamında kişisel verilerinize erişim, düzeltme, silme, işlemenin kısıtlanması ve itiraz haklarına sahipsiniz. Talepleriniz için <a href={`tel:${brand.primaryPhone}`} className="text-emerald-600 underline">{brand.primaryPhoneDisplay}</a> numaralı hattı arayabilirsiniz.</p>
           </div>
           <div className="border-t border-gray-100 px-5 py-3 text-right">
             <button type="button" onClick={() => document.getElementById("kvkk-modal")?.classList.add("hidden")}
@@ -695,11 +696,11 @@ export default function Home() {
             </button>
           </div>
           <div className="max-h-[60vh] overflow-y-auto px-5 py-4 text-xs leading-relaxed text-gray-600 space-y-3">
-            <p>Sancaktar Otomotiv olarak ziyaretçilerimizin gizliliğine saygı duyuyor ve kişisel bilgilerini korumayı öncelik olarak belirliyoruz.</p>
+            <p>{brand.name} olarak ziyaretçilerimizin gizliliğine saygı duyuyor ve kişisel bilgilerini korumayı öncelik olarak belirliyoruz.</p>
             <p><strong className="text-gray-800">Toplanan Bilgiler:</strong> Sitemizde yalnızca araç ilanı sorgulama ve iletişim formları aracılığıyla gönüllü olarak paylaştığınız bilgiler (ad-soyad, telefon, araç detayları) işlenmektedir. Ödeme bilgisi veya kimlik belgesi toplanmamaktadır.</p>
-            <p><strong className="text-gray-800">WhatsApp İletişimi:</strong> WhatsApp butonu aracılığıyla başlatılan görüşmeler Meta Platforms şirketinin gizlilik politikasına tabidir. Sancaktar Otomotiv bu görüşme içeriklerini saklamaz.</p>
+            <p><strong className="text-gray-800">WhatsApp İletişimi:</strong> WhatsApp butonu aracılığıyla başlatılan görüşmeler Meta Platforms şirketinin gizlilik politikasına tabidir. {brand.name} bu görüşme içeriklerini saklamaz.</p>
             <p><strong className="text-gray-800">Üçüncü Taraf Hizmetler:</strong> Sitede Supabase (veritabanı) ve Cloudflare (içerik dağıtımı) hizmetleri kullanılmaktadır. Bu hizmet sağlayıcılar kendi gizlilik politikalarına tabidir.</p>
-            <p><strong className="text-gray-800">İletişim:</strong> Gizlilik konusundaki sorularınız için <a href="tel:+905019443734" className="text-emerald-600 underline">0501 944 37 34</a> numaralı hattı arayabilirsiniz.</p>
+            <p><strong className="text-gray-800">İletişim:</strong> Gizlilik konusundaki sorularınız için <a href={`tel:${brand.primaryPhone}`} className="text-emerald-600 underline">{brand.primaryPhoneDisplay}</a> numaralı hattı arayabilirsiniz.</p>
           </div>
           <div className="border-t border-gray-100 px-5 py-3 text-right">
             <button type="button" onClick={() => document.getElementById("gizlilik-modal")?.classList.add("hidden")}
@@ -737,29 +738,25 @@ export default function Home() {
         </div>
       </div>
 
-      {/* SancakTok FAB */}
+      {/* GaleriTok FAB */}
       {!loading && (
         <div className="fixed bottom-20 right-4 z-40 lg:bottom-8 lg:right-6">
           <button
             type="button"
             onClick={() => openTok(0)}
-            aria-label="SancakTok"
+            aria-label={`${brand.tok.letter}${brand.tok.label}`}
             className="relative flex flex-col items-center gap-1 active:scale-95 transition-transform"
           >
-            {/* Ana yuvarlak */}
             <span
               className="relative flex h-14 w-14 items-center justify-center rounded-2xl shadow-xl"
               style={{ background: "linear-gradient(135deg, #010101 0%, #1a1a2e 100%)" }}
             >
-              {/* Renk hale */}
               <span className="absolute inset-0 rounded-2xl opacity-40" style={{ background: "radial-gradient(ellipse at 30% 40%, #ff0050 0%, transparent 55%), radial-gradient(ellipse at 70% 60%, #00f2ea 0%, transparent 55%)" }} />
-              {/* S harfi — TikTok renk shift */}
               <span className="relative flex h-7 w-7 items-center justify-center">
-                <span className="absolute text-2xl font-black translate-x-[2px] translate-y-[1px]" style={{ color: "#00f2ea" }}>S</span>
-                <span className="absolute text-2xl font-black -translate-x-[2px] -translate-y-[1px]" style={{ color: "#ff0050", opacity: 0.8 }}>S</span>
-                <span className="relative text-2xl font-black text-white">S</span>
+                <span className="absolute text-2xl font-black translate-x-[2px] translate-y-[1px]" style={{ color: "#00f2ea" }}>{brand.tok.letter}</span>
+                <span className="absolute text-2xl font-black -translate-x-[2px] -translate-y-[1px]" style={{ color: "#ff0050", opacity: 0.8 }}>{brand.tok.letter}</span>
+                <span className="relative text-2xl font-black text-white">{brand.tok.letter}</span>
               </span>
-              {/* Canlı badge */}
               <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#ff0050] text-[8px] font-black text-white ring-2 ring-white">
                 {tokCars.length > 99 ? "99+" : tokCars.length}
               </span>
@@ -785,7 +782,7 @@ export default function Home() {
 }
 
 /* ======================================================================== */
-/* HeroCarCard — öne çıkan araç, light background için                       */
+/* HeroCarCard                                                                */
 /* ======================================================================== */
 function HeroCarCard({ car }: { car: Car | null }) {
   const [imgError, setImgError] = useState(false);
@@ -808,7 +805,6 @@ function HeroCarCard({ car }: { car: Car | null }) {
 
   return (
     <Link href={`/ilan/${car.id}`} className="group block overflow-hidden rounded-2xl border border-white/10 bg-white/5 hover:bg-white/[0.07] transition-colors">
-      {/* Görsel */}
       <div className="relative aspect-[16/10] bg-gray-100 overflow-hidden">
         {image && !imgError ? (
           <>
@@ -821,13 +817,13 @@ function HeroCarCard({ car }: { car: Car | null }) {
             />
             {!imgLoaded && (
               <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-                <img src="/sancaktar-ikon.svg" alt="" className="h-14 w-14 opacity-20" />
+                <img src={brand.logos.icon} alt="" className="h-14 w-14 opacity-20" />
               </div>
             )}
           </>
         ) : (
           <div className="flex h-full items-center justify-center bg-gray-100">
-            <img src="/sancaktar-ikon.svg" alt="" className="h-14 w-14 opacity-20" />
+            <img src={brand.logos.icon} alt="" className="h-14 w-14 opacity-20" />
           </div>
         )}
         <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded bg-[#111827]/85 px-2 py-0.5 text-[9px] font-extrabold tracking-wider text-amber-400 uppercase">
@@ -838,7 +834,6 @@ function HeroCarCard({ car }: { car: Car | null }) {
         </span>
       </div>
 
-      {/* Bilgi */}
       <div className="p-4">
         <h3 className="text-base font-extrabold text-white">
           {car.brand} <span className="font-semibold text-gray-400">{car.model}</span>

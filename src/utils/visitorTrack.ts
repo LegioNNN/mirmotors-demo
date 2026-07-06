@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { brand } from "@/config/brand";
 
 /* -------------------------------------------------------------------------- */
 /*  Sayfa Görüntüleme Takibi                                                  */
@@ -43,10 +44,11 @@ let currentSessionId: string | null = null;
 function getSessionId(): string {
   if (currentSessionId) return currentSessionId;
   // LocalStorage'da session_id yoksa oluştur
-  let sid = localStorage.getItem("sancaktar_session_id");
+  const storageKey = `${brand.shortName.toLowerCase()}_session_id`;
+  let sid = localStorage.getItem(storageKey);
   if (!sid) {
     sid = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-    localStorage.setItem("sancaktar_session_id", sid);
+    localStorage.setItem(storageKey, sid);
   }
   currentSessionId = sid;
   return sid;
@@ -146,7 +148,7 @@ async function simpleFingerprint(): Promise<string> {
       ctx.fillStyle = "#f60";
       ctx.fillRect(125, 1, 62, 20);
       ctx.fillStyle = "#069";
-      ctx.fillText("Sancaktar", 2, 15);
+      ctx.fillText(brand.shortName, 2, 15);
       return canvas.toDataURL().slice(0, 64);
     }
   } catch {

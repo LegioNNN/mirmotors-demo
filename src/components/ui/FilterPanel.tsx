@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { brand } from "@/config/brand";
 
 export interface Filters {
   brand: string;
@@ -469,27 +470,27 @@ export default function FilterPanel({ filters, onChange, onApply, carCount, mobi
 
         {/* Mini harita kartı */}
         <a
-          href="https://maps.app.goo.gl/USRs34mY3L6xNjT86"
+          href={brand.mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md block"
         >
           <div className="relative h-32 w-full overflow-hidden pointer-events-none">
             <iframe
-              src="https://www.google.com/maps?q=2GH8%2B2J+B%C3%BCy%C3%BCk%C3%A7ekmece%2C+%C4%B0stanbul&output=embed"
+              src={brand.mapsEmbedUrl}
               width="100%"
               height="128"
               style={{ border: 0, marginBottom: -4 }}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title="Sancaktar Otomotiv Konum"
+              title={`${brand.name} Konum`}
             />
             <div className="absolute inset-0 bg-transparent group-hover:bg-black/5 transition-colors" />
           </div>
           <div className="flex items-center justify-between px-3 py-2.5">
             <div>
               <p className="text-[11px] font-bold text-gray-700 leading-tight">Galeriyi canlı görmek ister misiniz?</p>
-              <p className="mt-0.5 text-[10px] text-gray-400">Büyükçekmece, İstanbul</p>
+              <p className="mt-0.5 text-[10px] text-gray-400">{brand.district}, {brand.city}</p>
             </div>
             <span className="text-[10px] font-bold text-emerald-600 whitespace-nowrap">Rota Al →</span>
           </div>

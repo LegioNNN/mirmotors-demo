@@ -1,5 +1,7 @@
 "use client";
 
+import { brand } from "@/config/brand";
+
 /* ======================================================================== */
 /*  Step3Fiyat - Adim 3: Fiyat Beklentisi                                    */
 /*  Musteri kendi satis fiyati beklentisini yazar.                          */
@@ -158,7 +160,7 @@ export default function Step3Fiyat({
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
           <p className="text-xs leading-relaxed text-emerald-800">
-            Bu adım bağlayıcı fiyat oluşturmaz. Nihai değerlendirme Sancaktar
+            Bu adım bağlayıcı fiyat oluşturmaz. Nihai değerlendirme {brand.shortName}
             alım ekibi tarafından yapılır.
           </p>
         </div>

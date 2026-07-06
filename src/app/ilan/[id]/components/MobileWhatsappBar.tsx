@@ -1,5 +1,6 @@
 import type { Car } from "@/types";
 import { formatPrice } from "@/utils/detailFormatters";
+import { brand } from "@/config/brand";
 
 interface Props {
   car: Car;
@@ -43,7 +44,7 @@ export default function MobileWhatsappBar({ car, onClick, loading }: Props) {
 
         {/* Telefon butonu */}
         <a
-          href="tel:+905019443734"
+          href={`tel:${brand.primaryPhone}`}
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-gray-200 text-gray-600 transition-colors hover:bg-gray-50 active:bg-gray-100"
           aria-label="Telefon ile ara"
         >

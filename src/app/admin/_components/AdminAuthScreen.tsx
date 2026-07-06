@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { brand } from "@/config/brand";
 
-const ADMIN_PASSWORD = "sancaktar2026";
-const AUTH_KEY = "sancaktar_admin_auth";
+const ADMIN_PASSWORD = brand.adminPassword;
+const AUTH_KEY = brand.adminAuthKey;
 
 interface AdminAuthScreenProps {
   onAuth: () => void;
@@ -38,7 +39,7 @@ export default function AdminAuthScreen({ onAuth }: AdminAuthScreenProps) {
               </svg>
             </div>
             <h1 className="text-lg font-black tracking-tight text-white">
-              Sancaktar Yönetim
+              {brand.shortName} Yönetim
             </h1>
             <p className="mt-1 text-sm text-gray-400">
               Devam etmek için şifre girin.

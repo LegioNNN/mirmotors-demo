@@ -1,5 +1,6 @@
 import type { WhatsappNumber } from "@/types";
 import { supabase } from "@/lib/supabase";
+import { brand as brandConfig } from "@/config/brand";
 
 /* -------------------------------------------------------------------------- */
 /*  Supabase'den aktif personel havuzunu çek                                 */
@@ -62,7 +63,7 @@ export function generateWhatsAppUrl(
   year: number
 ): string {
   const message = encodeURIComponent(
-    `Merhaba Sancaktar Otomotiv, sitenizdeki ${brand} ${model} ${year} ilanıyla ilgileniyorum.`
+    `Merhaba ${brandConfig.name}, sitenizdeki ${brand} ${model} ${year} ilanıyla ilgileniyorum.`
   );
   const cleaned = phoneNumber.replace(/^\+/, "").replace(/[^0-9]/g, "");
   return `https://wa.me/${cleaned}?text=${message}`;

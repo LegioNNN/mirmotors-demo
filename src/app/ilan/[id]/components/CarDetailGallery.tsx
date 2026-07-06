@@ -160,13 +160,25 @@ export default function CarDetailGallery({ images, brand, model, segStyle, video
             <span className="text-sm font-bold text-gray-700">Araç Videosu</span>
           </div>
           <div className="aspect-video w-full overflow-hidden rounded-xl bg-gray-900">
-            <iframe
-              src={videoUrl}
-              className="h-full w-full"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              title={`${brand} ${model} video`}
-            />
+            {/* R2 doğrudan MP4 → native video; embed URL → iframe */}
+            {/\.(mp4|webm|mov|avi)(\?|$)/i.test(videoUrl) ? (
+              <video
+                src={videoUrl}
+                controls
+                playsInline
+                preload="metadata"
+                className="h-full w-full object-contain"
+                title={`${brand} ${model} video`}
+              />
+            ) : (
+              <iframe
+                src={videoUrl}
+                className="h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                title={`${brand} ${model} video`}
+              />
+            )}
           </div>
         </div>
       )}

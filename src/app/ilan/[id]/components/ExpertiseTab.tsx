@@ -1,6 +1,7 @@
 "use client";
 
 import type { ExpertisePart } from "@/utils/detailFormatters";
+import { brand } from "@/config/brand";
 
 interface Props {
   parts: ExpertisePart[];
@@ -63,7 +64,7 @@ export default function ExpertiseTab({ parts, orijinalCount, lokalBoyaliCount, b
           <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
         <p className="text-xs leading-relaxed text-amber-800">
-          Bu ekspertiz bilgileri <strong>Sancaktar Otomotiv çalışanları</strong> tarafından girilmiştir.
+          Bu ekspertiz bilgileri <strong>{brand.name} çalışanları</strong> tarafından girilmiştir.
           Kesin tespit için kendi ekspernize gösterebilirsiniz.
         </p>
       </div>

@@ -1,1 +1,1 @@
-export type AdminTab = "dashboard" | "yonetim" | "talepler" | "takipler" | "wa";
+export type AdminTab = "dashboard" | "yonetim" | "talepler" | "takip" | "wa";

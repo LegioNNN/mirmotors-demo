@@ -4,6 +4,7 @@
 
 import type { Car } from "@/types";
 import { formatPrice, formatKm } from "@/utils/detailFormatters";
+import { brand } from "@/config/brand";
 import React from "react";
 
 interface Props {
@@ -236,12 +237,12 @@ export default function CarDetailSidebar({ car, onWpClick, wpLoading }: Props) {
         <div className="mt-4 rounded-xl border border-amber-300/60 bg-amber-50 p-4">
           <div className="flex items-start gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[10px] font-black text-amber-800 mt-0.5">
-              AN
+              {brand.owner.initials}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 mb-1.5">
-                <span className="text-xs font-bold text-amber-900">Anıl Sancaktar</span>
-                <span className="text-[10px] text-amber-600/70">— Anıl'ın Notu</span>
+                <span className="text-xs font-bold text-amber-900">{brand.owner.name}</span>
+                <span className="text-[10px] text-amber-600/70">— {brand.owner.noteLabel}</span>
               </div>
               <p className="text-sm leading-relaxed text-amber-900">
                 {car.esnaf_notu ||

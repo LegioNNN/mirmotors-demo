@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createKaporaLink } from "@/utils/whatsappBalancer";
+import { brand } from "@/config/brand";
 
 export default function Navbar({
   activeTab,
@@ -36,7 +37,7 @@ export default function Navbar({
             onClick={() => { onTabChange("vitrin"); setMobileOpen(false); }}
             className="flex items-center gap-3 select-none"
           >
-            <img src="/sancaktar-logo-yatay.svg" alt="Sancaktar Otomotiv" className="h-9 w-auto" />
+            <img src={brand.logos.horizontal} alt={brand.name} className="h-9 w-auto" />
           </button>
 
           {/* Orta linkler — masaüstü */}

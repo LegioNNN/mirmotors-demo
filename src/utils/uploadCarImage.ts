@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { brand } from "@/config/brand";
 
 async function addWatermark(file: File): Promise<Blob> {
   return new Promise((resolve, reject) => {
@@ -19,7 +20,7 @@ async function addWatermark(file: File): Promise<Blob> {
         ctx.font = "bold 24px Arial";
         ctx.textAlign = "right";
         ctx.textBaseline = "bottom";
-        const watermarkText = "SANCAKTAR OTOMOTIV";
+        const watermarkText = brand.name.toUpperCase();
         ctx.fillText(watermarkText, img.width - 20, img.height - 20);
 
         canvas.toBlob((blob) => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef } from "react";
 import type { Car } from "@/types";
 import type { FormData } from "./AdminVehicleCard";
 import AdminEkspertizPanel, { DEFAULT_EKSPERTIZ } from "./AdminEkspertizPanel";
@@ -169,13 +170,14 @@ export default function AdminEditDrawer({
             />
           </div>
 
-          {/* Video URL */}
-          <div>
-            <label className={labelCls}>Video URL</label>
-            <input type="text" value={form.video_url} onChange={(e) => onChange("video_url", e.target.value)}
-              placeholder="https://... (SancakTok'ta oynatılır)"
-              className={inputCls} />
-          </div>
+          {/* Video Upload */}
+          <VideoUploadField
+            carId={car?.id ?? null}
+            value={form.video_url}
+            onChange={(url) => onChange("video_url", url)}
+            inputCls={inputCls}
+            labelCls={labelCls}
+          />
 
           {/* Esnaf Notu */}
           <div>
@@ -219,5 +221,92 @@ export default function AdminEditDrawer({
         </div>
       </div>
     </>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────── */
+/*  VideoUploadField — R2'ye MP4 yükleme + URL girişi                        */
+/* ─────────────────────────────────────────────────────────────────────────── */
+function VideoUploadField({
+  carId, value, onChange, inputCls, labelCls,
+}: {
+  carId: string | null;
+  value: string;
+  onChange: (url: string) => void;
+  inputCls: string;
+  labelCls: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = async (file: File) => {
+    if (!carId) {
+      setUploadError("Önce aracı kaydedin, sonra video yükleyin.");
+      return;
+    }
+    setUploading(true);
+    setUploadError(null);
+    setProgress("Yükleniyor...");
+
+    const fd = new FormData();
+    fd.append("file", file);
+    fd.append("carId", carId);
+
+    const res = await fetch("/api/upload-video", { method: "POST", body: fd }).catch(() => null);
+    if (!res || !res.ok) {
+      const err = res ? await res.json().catch(() => ({ error: "Hata" })) : { error: "Ağ hatası" };
+      setUploadError(err.error ?? "Yükleme başarısız");
+      setUploading(false);
+      setProgress(null);
+      return;
+    }
+    const { url } = await res.json();
+    onChange(url);
+    setUploading(false);
+    setProgress(null);
+  };
+
+  return (
+    <div>
+      <label className={labelCls}>Video (MP4)</label>
+      {/* Mevcut URL satırı */}
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="https://... veya aşağıdan yükle"
+        className={inputCls}
+      />
+      {/* Upload butonu */}
+      <div className="mt-2 flex items-center gap-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="video/mp4,video/quicktime,video/webm"
+          className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+        />
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={() => fileRef.current?.click()}
+          className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+        >
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+          </svg>
+          {uploading ? progress ?? "Yükleniyor..." : "R2'ye Yükle"}
+        </button>
+        {value && (
+          <a href={value} target="_blank" rel="noreferrer" className="text-[11px] text-emerald-600 hover:underline">
+            ▶ Önizle
+          </a>
+        )}
+      </div>
+      {uploadError && <p className="mt-1 text-[11px] text-red-500">{uploadError}</p>}
+      <p className="mt-1 text-[10px] text-gray-400">Maks 200 MB · MP4, MOV, WEBM</p>
+    </div>
   );
 }
