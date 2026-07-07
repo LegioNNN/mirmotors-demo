@@ -39,8 +39,8 @@ export const segmentConfig: Record<CarSegment, SegmentStyle> = {
   },
   Premium: {
     label: "Premium",
-    wrapper: "bg-amber-50 border border-amber-200 text-amber-800 shadow-sm shadow-amber-200/50 px-2.5 py-1 rounded-lg text-[11px] font-bold ring-1 ring-amber-300/30",
-    accentDot: "bg-amber-500",
+    wrapper: "bg-blue-50 border border-blue-200 text-blue-800 shadow-sm shadow-blue-200/50 px-2.5 py-1 rounded-lg text-[11px] font-bold ring-1 ring-blue-300/30",
+    accentDot: "bg-blue-500",
   },
   "Yayla Kan": {
     label: "Fırsat",

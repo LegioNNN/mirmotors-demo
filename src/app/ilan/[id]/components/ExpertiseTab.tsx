@@ -58,12 +58,12 @@ export default function ExpertiseTab({ parts, orijinalCount, lokalBoyaliCount, b
     <div className="mt-5 space-y-4">
 
       {/* Uyarı bandı */}
-      <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3.5">
-        <svg className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-3.5">
+        <svg className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
           <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
           <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
-        <p className="text-xs leading-relaxed text-amber-800">
+        <p className="text-xs leading-relaxed text-blue-800">
           Bu ekspertiz bilgileri <strong>{brand.name} çalışanları</strong> tarafından girilmiştir.
           Kesin tespit için kendi ekspernize gösterebilirsiniz.
         </p>

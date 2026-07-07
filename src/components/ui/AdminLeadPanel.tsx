@@ -357,7 +357,7 @@ export default function AdminLeadPanel({ leads, onStatusChange, onNoteChange, on
           </div>
           <div className="flex gap-1.5">
             {([
-              { key: "Bugün" as const, label: "Bugün", active: "border-amber-400 bg-amber-50 text-amber-700" },
+              { key: "Bugün" as const, label: "Bugün", active: "border-blue-400 bg-blue-50 text-blue-700" },
               { key: "Geciken" as const, label: "Gecikenler", active: "border-red-400 bg-red-50 text-red-600" },
             ]).map((sf) => (
               <button key={sf.key} type="button"

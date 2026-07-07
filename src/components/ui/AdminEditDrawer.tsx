@@ -155,7 +155,7 @@ export default function AdminEditDrawer({
               <label className="flex cursor-pointer items-center gap-2">
                 <input type="checkbox" checked={form.is_featured}
                   onChange={(e) => onChange("is_featured", e.target.checked ? "true" : "false")}
-                  className="h-4 w-4 rounded border-gray-300 text-amber-500 accent-amber-500" />
+                  className="h-4 w-4 rounded border-gray-300 text-blue-500 accent-blue-500" />
                 <span className="text-sm font-medium text-gray-600 select-none">Vitrine çıkar</span>
               </label>
             </div>

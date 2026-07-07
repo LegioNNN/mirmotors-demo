@@ -9,8 +9,8 @@ const formatKm = (n: number) => new Intl.NumberFormat("tr-TR").format(n);
 
 const statusColors: Record<string, string> = {
   Aktif: "bg-emerald-100 text-emerald-700",
-  Kaporalandı: "bg-amber-100 text-amber-700",
-  Opsiyonlu: "bg-amber-100 text-amber-700",
+  Kaporalandı: "bg-blue-100 text-blue-700",
+  Opsiyonlu: "bg-blue-100 text-blue-700",
   Satıldı: "bg-red-100 text-red-600",
   "Yayından Kaldırıldı": "bg-gray-100 text-gray-400",
 };
@@ -135,7 +135,7 @@ export default function AdminVehicleCard({
           <button type="button" disabled={updatingFeaturedId === car.id}
             onClick={() => onFeaturedToggle(car.id, car.is_featured)}
             title={car.is_featured ? "Vitrinden Kaldır" : "Vitrine Çıkar"}
-            className={`flex h-6 w-6 items-center justify-center rounded transition-all disabled:opacity-40 ${car.is_featured ? "bg-amber-100 text-amber-600" : "bg-gray-100 text-gray-400 hover:bg-amber-50 hover:text-amber-500"}`}>
+            className={`flex h-6 w-6 items-center justify-center rounded transition-all disabled:opacity-40 ${car.is_featured ? "bg-blue-100 text-blue-600" : "bg-gray-100 text-gray-400 hover:bg-blue-50 hover:text-blue-500"}`}>
             <svg className="h-3 w-3" viewBox="0 0 24 24" fill={car.is_featured ? "currentColor" : "none"} stroke="currentColor" strokeWidth={1.5}>
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>

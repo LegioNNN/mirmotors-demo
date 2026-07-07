@@ -97,7 +97,7 @@ export default function CarDetailSidebar({ car, onWpClick, wpLoading }: Props) {
           </div>
           <div className="flex flex-wrap items-center gap-1.5 shrink-0">
             {isFeatured && !isSold && (
-              <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700">
+              <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-700">
                 <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
@@ -139,13 +139,13 @@ export default function CarDetailSidebar({ car, onWpClick, wpLoading }: Props) {
 
         {/* --- DURUM UYARILARI --- */}
         {isOptioned && (
-          <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-            <svg className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+            <svg className="mt-0.5 h-4 w-4 shrink-0 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="16" x2="12" y2="12" />
               <line x1="12" y1="8" x2="12.01" y2="8" />
             </svg>
-            <p className="text-xs font-medium text-amber-800">
+            <p className="text-xs font-medium text-blue-800">
               Bu araç için kapora süreci devam ediyor. Güncel durumu öğrenmek için WhatsApp üzerinden iletişime geçin.
             </p>
           </div>
@@ -234,17 +234,17 @@ export default function CarDetailSidebar({ car, onWpClick, wpLoading }: Props) {
         </div>
 
         {/* Esnaf Notu — dürüstlük kalbi */}
-        <div className="mt-4 rounded-xl border border-amber-300/60 bg-amber-50 p-4">
+        <div className="mt-4 rounded-xl border border-blue-300/60 bg-blue-50 p-4">
           <div className="flex items-start gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[10px] font-black text-amber-800 mt-0.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-200 text-[10px] font-black text-blue-800 mt-0.5">
               {brand.owner.initials}
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 mb-1.5">
-                <span className="text-xs font-bold text-amber-900">{brand.owner.name}</span>
-                <span className="text-[10px] text-amber-600/70">— {brand.owner.noteLabel}</span>
+                <span className="text-xs font-bold text-blue-900">{brand.owner.name}</span>
+                <span className="text-[10px] text-blue-600/70">— {brand.owner.noteLabel}</span>
               </div>
-              <p className="text-sm leading-relaxed text-amber-900">
+              <p className="text-sm leading-relaxed text-blue-900">
                 {car.esnaf_notu ||
                   "Malımızın arkasındayız. Beğendiğin aracı gel gör, istediğin gibi ekspertize sok."}
               </p>

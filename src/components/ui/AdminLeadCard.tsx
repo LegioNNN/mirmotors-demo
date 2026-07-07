@@ -51,7 +51,7 @@ const formatFollowUpDate = (isoStr: string) => {
 };
 
 const statusConfig: Record<LeadStatus, { label: string; pill: string; bar: string }> = {
-  Bekliyor:          { label: "Bekliyor",      pill: "bg-amber-100 text-amber-700",     bar: "bg-amber-400" },
+  Bekliyor:          { label: "Bekliyor",      pill: "bg-blue-100 text-blue-700",     bar: "bg-blue-400" },
   Arandı:            { label: "Arandı",         pill: "bg-sky-100 text-sky-700",         bar: "bg-sky-400" },
   Ulaşılamadı:       { label: "Ulaşılamadı",   pill: "bg-orange-100 text-orange-700",   bar: "bg-orange-400" },
   "Tekrar Aranacak": { label: "Tekrar Dönüş",  pill: "bg-purple-100 text-purple-700",   bar: "bg-purple-500" },
@@ -75,7 +75,7 @@ export default function AdminLeadCard({
 
   const accentBar = followUpWarning === "overdue"
     ? "bg-red-500" : followUpWarning === "today"
-    ? "bg-amber-400" : cfg.bar;
+    ? "bg-blue-400" : cfg.bar;
 
   const hasPhotos = (lead.photo_urls?.length ?? 0) > 0;
   const price = formatPrice(lead.expected_price);
@@ -112,7 +112,7 @@ export default function AdminLeadCard({
 
           {/* Gecikme / bugün uyarısı */}
           {followUpWarning && (
-            <span className={`hidden shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold sm:inline-flex ${followUpWarning === "overdue" ? "bg-red-100 text-red-600" : "bg-amber-100 text-amber-700"}`}>
+            <span className={`hidden shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold sm:inline-flex ${followUpWarning === "overdue" ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-700"}`}>
               {followUpWarning === "overdue" ? "GECİKTİ" : "BUGÜN"}
             </span>
           )}
@@ -209,7 +209,7 @@ export default function AdminLeadCard({
               {lead.wants_trade != null && (
                 <div>
                   <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Takas İster mi?</p>
-                  <p className={`mt-0.5 text-xs font-bold ${lead.wants_trade ? "text-amber-600" : "text-gray-500"}`}>
+                  <p className={`mt-0.5 text-xs font-bold ${lead.wants_trade ? "text-blue-600" : "text-gray-500"}`}>
                     {lead.wants_trade ? "Evet, istiyor" : "Hayır"}
                   </p>
                 </div>
@@ -254,7 +254,7 @@ export default function AdminLeadCard({
             {lead.follow_up_at && editingFollowUpId !== lead.id && (
               <div className={`mb-4 inline-flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[11px] font-medium ${
                 followUpWarning === "overdue" ? "bg-red-50 text-red-700" :
-                followUpWarning === "today" ? "bg-amber-50 text-amber-700" : "bg-purple-50 text-purple-700"
+                followUpWarning === "today" ? "bg-blue-50 text-blue-700" : "bg-purple-50 text-purple-700"
               }`}>
                 <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -292,7 +292,7 @@ export default function AdminLeadCard({
             )}
 
             {/* Admin notu */}
-            <div className={`mb-4 rounded-xl border p-3 ${lead.admin_note ? "border-amber-200 bg-amber-50/60" : "border-gray-200 bg-white"}`}>
+            <div className={`mb-4 rounded-xl border p-3 ${lead.admin_note ? "border-blue-200 bg-blue-50/60" : "border-gray-200 bg-white"}`}>
               <div className="flex items-center justify-between mb-1.5">
                 <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400">Admin Notu</p>
                 {editingNoteId !== lead.id && (
@@ -306,7 +306,7 @@ export default function AdminLeadCard({
                 <div className="space-y-2">
                   <textarea rows={3} value={noteText} onChange={(e) => onNoteTextChange(e.target.value)}
                     autoFocus placeholder="Not ekleyin..."
-                    className="w-full resize-none rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-gray-700 outline-none focus:border-[#111827] placeholder:text-gray-300" />
+                    className="w-full resize-none rounded-lg border border-blue-200 bg-white px-3 py-2 text-xs text-gray-700 outline-none focus:border-[#111827] placeholder:text-gray-300" />
                   {noteError && <p className="text-[10px] text-red-500">{noteError}</p>}
                   <div className="flex gap-2">
                     <button type="button" disabled={savingNoteId === lead.id} onClick={() => onSaveNote(lead.id)}
