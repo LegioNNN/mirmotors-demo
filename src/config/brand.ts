@@ -12,8 +12,8 @@ export const brand = {
 
   // ── Konum ─────────────────────────────────────────────────────────────────
   city: "İstanbul",
-  district: "Büyükçekmece",
-  address: "Büyükçekmece / İstanbul",   // Kesin adres Recep'ten alınacak
+  district: "Ataşehir",
+  address: "Ferhatpaşa, 9. Sk. No:37, 34750 Ataşehir / İstanbul",
   licenseNo: "3408026",
 
   // ── Stok & Slogan ─────────────────────────────────────────────────────────
@@ -67,15 +67,15 @@ export const brand = {
       followers: "—",
     },
     whatsappChannel: {
-      url: "https://whatsapp.com/channel/0029Vb20KZ80lwgjqaluJA1L",
+      url: "https://www.whatsapp.com/channel/0029Vb20KZ80lwgjqaIuJA1L",
       followers: "—",
     },
     sahibinden: "https://mirmotors.sahibinden.com",   // Gerçek URL Recep'ten
   },
 
   // ── Google Maps ───────────────────────────────────────────────────────────
-  mapsUrl: "https://maps.google.com/?q=Büyükçekmece+İstanbul",
-  mapsEmbedUrl: "https://www.google.com/maps?q=B%C3%BCy%C3%BCk%C3%A7ekmece%2C+%C4%B0stanbul&output=embed",
+  mapsUrl: "https://maps.google.com/?q=Ferhatpaşa+9.+Sk+No:37+Ataşehir+İstanbul",
+  mapsEmbedUrl: "https://www.google.com/maps?q=Ferhatpa%C5%9Fa%2C+9.+Sk+No%3A37%2C+34750+Ata%C5%9Fehir%2F%C4%B0stanbul&output=embed",
 
   // ── Logo dosyaları (public/ klasörü) ─────────────────────────────────────
   logos: {
