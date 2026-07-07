@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
-  <rect width="200" height="200" fill="#1e3a5f"/>
-  <circle cx="100" cy="80" r="40" fill="#2563eb" opacity="0.3"/>
-  <circle cx="100" cy="78" r="32" fill="#3b82f6"/>
-  <text x="100" y="91" font-family="Arial Black, sans-serif" font-size="28" font-weight="900" fill="white" text-anchor="middle">RC</text>
-  <ellipse cx="100" cy="175" rx="58" ry="38" fill="#2563eb" opacity="0.25"/>
-  <ellipse cx="100" cy="168" rx="52" ry="34" fill="#1d4ed8" opacity="0.4"/>
-</svg>

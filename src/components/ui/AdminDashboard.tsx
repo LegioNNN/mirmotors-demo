@@ -144,19 +144,19 @@ export default function AdminDashboard({
         {/* Bekleyen Talepler — fırsat, 0'dan büyükse uyarı */}
         <div className={`rounded-xl border p-4 shadow-sm transition-colors ${
           !loading && pendingCount > 0
-            ? "border-blue-300 bg-blue-50"
+            ? "border-amber-300 bg-amber-50"
             : "border-gray-200 bg-white"
         }`}>
           <p className={`text-[11px] font-bold uppercase tracking-wider ${
-            !loading && pendingCount > 0 ? "text-blue-600" : "text-gray-400"
+            !loading && pendingCount > 0 ? "text-amber-600" : "text-gray-400"
           }`}>Değerlendirilecek Fırsat</p>
           <p className={`mt-2 text-3xl font-black ${
-            !loading && pendingCount > 0 ? "text-blue-700" : "text-[#111827]"
+            !loading && pendingCount > 0 ? "text-amber-700" : "text-[#111827]"
           }`}>
             {loading ? <span className="text-gray-200">—</span> : pendingCount}
           </p>
           <p className={`mt-1 text-[11px] ${
-            !loading && pendingCount > 0 ? "font-semibold text-blue-600" : "text-gray-400"
+            !loading && pendingCount > 0 ? "font-semibold text-amber-600" : "text-gray-400"
           }`}>
             {!loading && pendingCount > 0 ? "Dönüş bekleyen müşteri" : "Tümü değerlendirildi"}
           </p>

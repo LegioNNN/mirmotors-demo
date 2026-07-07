@@ -565,7 +565,7 @@ export default function AdminVehiclePanel() {
               <span className="text-gray-200">|</span>
               <span><span className="font-bold text-emerald-600">{activeCount}</span> aktif</span>
               <span className="text-gray-200">|</span>
-              <span><span className="font-bold text-blue-600">{featuredCount}</span> vitrinde</span>
+              <span><span className="font-bold text-amber-600">{featuredCount}</span> vitrinde</span>
             </div>
           </div>
           <button
@@ -618,7 +618,7 @@ export default function AdminVehiclePanel() {
             {([
               { label: "Tümü", value: null, color: "bg-[#111827] text-white", idle: "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50" },
               { label: "Aktif", value: "Aktif", color: "bg-emerald-600 text-white", idle: "bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100" },
-              { label: "Kaporalandı", value: "Kaporalandı", color: "bg-blue-500 text-white", idle: "bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100" },
+              { label: "Kaporalandı", value: "Kaporalandı", color: "bg-amber-500 text-white", idle: "bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100" },
               { label: "Satıldı", value: "Satıldı", color: "bg-red-500 text-white", idle: "bg-red-50 text-red-600 border border-red-200 hover:bg-red-100" },
               { label: "Yayından Kaldırıldı", value: "Yayından Kaldırıldı", color: "bg-gray-500 text-white", idle: "bg-gray-50 text-gray-500 border border-gray-200 hover:bg-gray-100" },
             ] as const).map(({ label, value, color, idle }) => {
@@ -772,12 +772,12 @@ export default function AdminVehiclePanel() {
 
           {/* Alt: vitrin checkbox + kaydet */}
           <div className="mt-4 flex items-center justify-between">
-            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm hover:border-blue-300 transition-colors">
+            <label className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm hover:border-amber-300 transition-colors">
               <input type="checkbox" checked={form.is_featured}
                 onChange={(e) => { setForm((prev) => ({ ...prev, is_featured: e.target.checked })); setSaveError(null); }}
-                className="h-4 w-4 rounded border-gray-300 accent-blue-500" />
+                className="h-4 w-4 rounded border-gray-300 accent-amber-500" />
               <span className="text-sm font-semibold text-gray-700 select-none">Vitrine çıkar</span>
-              <svg className="h-4 w-4 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+              <svg className="h-4 w-4 text-amber-400" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
             </label>

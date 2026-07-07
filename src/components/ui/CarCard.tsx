@@ -29,7 +29,7 @@ const segmentConfig: Record<CarSegment, SegmentStyle> = {
   },
   Premium: {
     label: "PREMIUM",
-    cls: "bg-[#111827] text-blue-400",
+    cls: "bg-[#111827] text-amber-400",
   },
   "Yayla Kan": {
     label: "EKONOMİK",
@@ -92,7 +92,7 @@ export default function CarCard({ car }: CarCardProps) {
         isSold
           ? "border-gray-200 opacity-60 grayscale-[30%]"
           : isOptioned
-          ? "border-blue-200 shadow-sm shadow-blue-50"
+          ? "border-amber-200 shadow-sm shadow-amber-50"
           : isFeatured
           ? "border-gray-300 shadow-sm ring-1 ring-gray-200"
           : "border-gray-200 shadow-sm"
@@ -135,7 +135,7 @@ export default function CarCard({ car }: CarCardProps) {
 
         {/* Öne çıkan badge */}
         {!isSold && isFeatured && (
-          <span className="absolute left-2.5 top-2.5 z-10 inline-flex items-center gap-1 rounded bg-[#111827]/90 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wider uppercase text-blue-400">
+          <span className="absolute left-2.5 top-2.5 z-10 inline-flex items-center gap-1 rounded bg-[#111827]/90 px-1.5 py-0.5 text-[9px] font-extrabold tracking-wider uppercase text-amber-400">
             <svg className="h-2 w-2" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
@@ -168,10 +168,10 @@ export default function CarCard({ car }: CarCardProps) {
         {/* Kaporalandı overlay — diyagonal şerit efekti */}
         {isOptioned && (
           <>
-            <div className="absolute inset-0 z-10 bg-blue-950/30 backdrop-blur-[1px]" />
+            <div className="absolute inset-0 z-10 bg-amber-950/30 backdrop-blur-[1px]" />
             {/* Köşe şeridi */}
             <div className="absolute z-20 top-0 right-0 overflow-hidden w-28 h-28 pointer-events-none">
-              <div className="absolute top-5 right-[-30px] w-36 py-1.5 bg-blue-500 rotate-45 text-center">
+              <div className="absolute top-5 right-[-30px] w-36 py-1.5 bg-amber-500 rotate-45 text-center">
                 <span className="text-[9px] font-black tracking-[0.2em] text-white uppercase">Kapora</span>
               </div>
             </div>

@@ -199,7 +199,7 @@ export default function SancakTokModal({ open, onClose, cars, initialIndex = 0 }
         {/* Segment rozeti */}
         {car.segment && (
           <div className="absolute left-4 top-14 z-10">
-            <span className="rounded-full bg-black/70 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-blue-400 border border-blue-700/30">
+            <span className="rounded-full bg-black/70 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-400 border border-amber-700/30">
               {car.segment}
             </span>
           </div>
@@ -226,7 +226,7 @@ export default function SancakTokModal({ open, onClose, cars, initialIndex = 0 }
           </div>
 
 
-          <p className="mt-3 text-4xl font-black tracking-tight text-blue-400">
+          <p className="mt-3 text-4xl font-black tracking-tight text-amber-400">
             {car.price > 0 ? `${fmt(car.price)} ₺` : "Fiyat için ara"}
           </p>
 

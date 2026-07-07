@@ -110,12 +110,12 @@ export default function CarDetailClient({ car }: Props) {
             </div>
             {/* Esnaf notu — mobilde burada göster */}
             {car.esnaf_notu && (
-              <div className="mt-3 rounded-xl border border-blue-200/60 bg-blue-50 p-3">
+              <div className="mt-3 rounded-xl border border-amber-200/60 bg-amber-50 p-3">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-200 text-[9px] font-black text-blue-800">{brand.owner.initials}</div>
-                  <span className="text-[11px] font-bold text-blue-900">{brand.owner.noteLabel}</span>
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-200 text-[9px] font-black text-amber-800">{brand.owner.initials}</div>
+                  <span className="text-[11px] font-bold text-amber-900">{brand.owner.noteLabel}</span>
                 </div>
-                <p className="text-xs leading-relaxed text-blue-900">{car.esnaf_notu}</p>
+                <p className="text-xs leading-relaxed text-amber-900">{car.esnaf_notu}</p>
               </div>
             )}
           </div>

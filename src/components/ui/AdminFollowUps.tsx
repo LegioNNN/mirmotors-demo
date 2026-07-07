@@ -66,7 +66,7 @@ export default function AdminFollowUps({
    * label renkleri
    */
   const statusColors: Record<string, string> = {
-    "Bekliyor": "bg-blue-100 text-blue-800",
+    "Bekliyor": "bg-amber-100 text-amber-800",
     "Arandı": "bg-blue-100 text-blue-800",
     "Ulaşılamadı": "bg-red-100 text-red-800",
     "Tekrar Aranacak": "bg-purple-100 text-purple-800",
@@ -95,8 +95,8 @@ export default function AdminFollowUps({
           onClick={() => setFilter("pending")}
           className={`rounded-lg px-4 py-2 text-xs font-bold transition-all ${
             filter === "pending"
-              ? "bg-blue-600 text-white shadow-sm"
-              : "border border-blue-200 text-blue-700 hover:bg-blue-50"
+              ? "bg-amber-600 text-white shadow-sm"
+              : "border border-amber-200 text-amber-700 hover:bg-amber-50"
           }`}
         >
           Bekleyen ({leads.filter(l => l.status === "Bekliyor").length})
@@ -106,8 +106,8 @@ export default function AdminFollowUps({
           onClick={() => setFilter("today")}
           className={`rounded-lg px-4 py-2 text-xs font-bold transition-all ${
             filter === "today"
-              ? "bg-blue-700 text-white shadow-sm"
-              : "border border-blue-300 text-blue-800 hover:bg-blue-50"
+              ? "bg-amber-700 text-white shadow-sm"
+              : "border border-amber-300 text-amber-800 hover:bg-amber-50"
           }`}
         >
           Bugün Dönüş ({leads.filter(l => l.follow_up_at && isTodayFollowUp(l.follow_up_at) && !terminalStatuses.includes(l.status)).length})
@@ -159,7 +159,7 @@ export default function AdminFollowUps({
                   lead.follow_up_at && isOverdue(lead.follow_up_at) && !terminalStatuses.includes(lead.status)
                     ? "border-red-200"
                     : lead.follow_up_at && isTodayFollowUp(lead.follow_up_at) && !terminalStatuses.includes(lead.status)
-                    ? "border-blue-200"
+                    ? "border-amber-200"
                     : "border-gray-200"
                 }`}
               >
@@ -180,7 +180,7 @@ export default function AdminFollowUps({
                       {lead.phone} &middot; {lead.brand} {lead.model} {lead.year}
                     </p>
                     {followUpStr && (
-                      <p className="mt-0.5 text-[11px] font-medium text-blue-700">
+                      <p className="mt-0.5 text-[11px] font-medium text-amber-700">
                         📅 Takip: {followUpStr}
                       </p>
                     )}

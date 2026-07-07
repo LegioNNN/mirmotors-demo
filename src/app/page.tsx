@@ -198,7 +198,7 @@ export default function Home() {
                 <div className="grid grid-cols-4 divide-x divide-gray-800 py-3">
                   <StatPill value={stats.total} label="Araç" dark />
                   <StatPill value={stats.active} label="Satışta" accent="green" dark />
-                  <StatPill value={stats.optioned} label="Kaporalı" accent="blue" dark />
+                  <StatPill value={stats.optioned} label="Kaporalı" accent="amber" dark />
                   <StatPill value={stats.sold} label="Satılan" dark />
                 </div>
               </div>
@@ -395,8 +395,8 @@ export default function Home() {
                           <h3 className="font-black text-[#111827]">{brand.owner.name}</h3>
                           <p className="text-xs font-semibold text-green-700 mt-0.5">{brand.owner.title}</p>
                         </div>
-                        <span className="inline-flex items-center gap-1 rounded-lg bg-blue-50 border border-blue-200 px-2.5 py-1 text-xs font-extrabold text-blue-800">
-                          <svg className="h-3 w-3 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                        <span className="inline-flex items-center gap-1 rounded-lg bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-extrabold text-amber-800">
+                          <svg className="h-3 w-3 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                           </svg>
                           {brand.owner.since}
@@ -826,7 +826,7 @@ function HeroCarCard({ car }: { car: Car | null }) {
             <img src={brand.logos.icon} alt="" className="h-14 w-14 opacity-20" />
           </div>
         )}
-        <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded bg-[#111827]/85 px-2 py-0.5 text-[9px] font-extrabold tracking-wider text-blue-400 uppercase">
+        <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded bg-[#111827]/85 px-2 py-0.5 text-[9px] font-extrabold tracking-wider text-amber-400 uppercase">
           <svg className="h-2 w-2" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
           </svg>
@@ -859,12 +859,12 @@ function HeroCarCard({ car }: { car: Car | null }) {
 function StatPill({ value, label, accent = "gray", dark = false }: {
   value: number;
   label: string;
-  accent?: "green" | "blue" | "gray";
+  accent?: "green" | "amber" | "gray";
   dark?: boolean;
 }) {
   const colors = {
     green: dark ? "text-green-400" : "text-green-700",
-    blue: dark ? "text-blue-400" : "text-blue-700",
+    amber: dark ? "text-amber-400" : "text-amber-700",
     gray: dark ? "text-white" : "text-[#111827]",
   };
   return (
