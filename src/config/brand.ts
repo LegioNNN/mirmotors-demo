@@ -80,14 +80,14 @@ export const brand = {
   },
 
   // ── Google Maps ───────────────────────────────────────────────────────────
-  mapsUrl: "https://maps.google.com/?q=Ferhatpaşa+9.+Sk+No:37+Ataşehir+İstanbul",
-  mapsEmbedUrl: "https://www.google.com/maps?q=Ferhatpa%C5%9Fa%2C+9.+Sk+No%3A37%2C+34750+Ata%C5%9Fehir%2F%C4%B0stanbul&output=embed",
+  mapsUrl: "https://maps.google.com/?q=Ferhatpaşa,+9.+Sk.+No:37,+34750+Ataşehir/İstanbul,+Istanbul,+Turkey",
+  mapsEmbedUrl: "https://www.google.com/maps?q=Ferhatpa%C5%9Fa%2C+9.+Sk.+No%3A37%2C+34750+Ata%C5%9Fehir%2F%C4%B0stanbul%2C+Istanbul%2C+Turkey&output=embed",
 
   // ── Logo dosyaları (public/ klasörü) ─────────────────────────────────────
   logos: {
-    horizontal: "/mir-logo.jpg",
-    horizontalDark: "/mir-logo.jpg",
-    icon: "/mir-logo.jpg",
+    horizontal: "/mir-logo-yazi.png",
+    horizontalDark: "/mir-logo-yazi.png",
+    icon: "/mir-logo-icon.png",
   },
   banner: "/mir-banner.jpg",
 
