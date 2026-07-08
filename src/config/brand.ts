@@ -54,23 +54,29 @@ export const brand = {
       sub: "Used Vehicles",
     },
     tiktok: {
-      handle: "@mir_motors",
-      url: "https://www.tiktok.com/@mir_motors",
+      handle: "@mirmotors",
+      url: "https://www.tiktok.com/@mirmotors",
       displayName: "Mir Motors",
-      followers: "—",
+      followers: "339.2B",
       likes: "—",
     },
     facebook: {
-      handle: "Mir Motors",
-      sub: "Mir Motors",
-      url: "https://www.facebook.com/mirmotors",
-      followers: "—",
+      handle: "MİR motors",
+      sub: "MİR motors",
+      url: "https://www.facebook.com/p/M%C4%B0R-motors-100083050433271/",
+      followers: "374B",
     },
     whatsappChannel: {
       url: "https://www.whatsapp.com/channel/0029Vb20KZ80lwgjqaIuJA1L",
-      followers: "—",
+      followers: "124B",
     },
-    sahibinden: "https://mirmotors.sahibinden.com",   // Gerçek URL Recep'ten
+    youtube: {
+      handle: "@mir_motors",
+      url: "https://www.youtube.com/@mir_motors",
+      displayName: "Mir Motors",
+      subscribers: "5.76B",
+    },
+    sahibinden: "https://mirmotors.sahibinden.com",
   },
 
   // ── Google Maps ───────────────────────────────────────────────────────────
@@ -79,10 +85,11 @@ export const brand = {
 
   // ── Logo dosyaları (public/ klasörü) ─────────────────────────────────────
   logos: {
-    horizontal: "/mir-logo-yatay.svg",
-    horizontalDark: "/mir-logo-yatay-koyu.svg",
-    icon: "/mir-ikon.svg",
+    horizontal: "/mir-logo.jpg",
+    horizontalDark: "/mir-logo.jpg",
+    icon: "/mir-logo.jpg",
   },
+  banner: "/mir-banner.jpg",
 
   // ── GaleriTok özelliği ────────────────────────────────────────────────────
   tok: {
