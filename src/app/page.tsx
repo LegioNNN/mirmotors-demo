@@ -568,7 +568,7 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {/* Marka */}
             <div className="sm:col-span-2">
-              <img src={brand.logos.horizontalDark} alt={brand.name} className="h-9 w-auto" />
+              <img src={brand.logos.horizontalDark} alt={brand.name} className="h-14 w-auto" />
               <p className="mt-4 text-sm text-gray-500 max-w-xs">
                 {brand.district}&apos;de geniş stok, dürüst esnaf notu, hızlı iletişim.
               </p>

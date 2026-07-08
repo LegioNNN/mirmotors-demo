@@ -37,7 +37,7 @@ export default function Navbar({
             onClick={() => { onTabChange("vitrin"); setMobileOpen(false); }}
             className="flex items-center gap-3 select-none"
           >
-            <img src={brand.logos.horizontal} alt={brand.name} className="h-9 w-auto" />
+            <img src={brand.logos.horizontal} alt={brand.name} className="h-14 w-auto" />
           </button>
 
           {/* Orta linkler — masaüstü */}
