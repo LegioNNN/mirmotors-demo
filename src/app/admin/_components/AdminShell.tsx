@@ -109,9 +109,12 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
       {/* ── Sidebar (desktop) ── */}
       <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-gray-200 bg-white">
         {/* Logo */}
-        <div className="flex flex-col gap-0.5 px-5 py-4 border-b border-gray-100">
-          <img src={brand.logos.horizontal} alt={brand.name} className="h-8 w-auto" />
-          <p className="text-[9px] font-semibold uppercase tracking-widest text-gray-400 pl-0.5">Admin Panel</p>
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
+          <img src={brand.logos.icon} alt={brand.name} className="h-10 w-10 object-contain" />
+          <div>
+            <p className="text-sm font-bold text-gray-900">{brand.shortName} Motors</p>
+            <p className="text-[9px] font-semibold uppercase tracking-widest text-gray-400">Admin Panel</p>
+          </div>
         </div>
 
         {/* Nav */}
@@ -178,8 +181,9 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
           <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
           <aside className="absolute left-0 top-0 bottom-0 w-56 bg-white shadow-xl flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <div className="flex items-center">
-                <img src={brand.logos.horizontal} alt={brand.name} className="h-7 w-auto" />
+              <div className="flex items-center gap-2">
+                <img src={brand.logos.icon} alt={brand.name} className="h-9 w-9 object-contain" />
+                <span className="text-sm font-bold text-gray-900">{brand.shortName} Motors</span>
               </div>
               <button type="button" onClick={() => setSidebarOpen(false)} className="rounded-lg p-1 hover:bg-gray-100">
                 <svg className="h-4 w-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
