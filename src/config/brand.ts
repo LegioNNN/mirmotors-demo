@@ -37,7 +37,7 @@ export const brand = {
     title: "Mir Motors Yetkilisi",
     initials: "RC",
     since: 2018,
-    photo: "/recep-cidaci.png",         // public/ klasörüne eklenecek
+    photo: "/recep-cidaci.jpg",
     instagramHandle: "@mir_motors",
     instagramUrl: "https://www.instagram.com/mir_motors",
     instagramFollowers: "709B",
