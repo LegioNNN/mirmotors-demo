@@ -76,12 +76,16 @@ function CarSlide({ car, active }: { car: Car; active: boolean }) {
   return (
     <div className="absolute inset-0">
       {tiktokEmbed ? (
-        <iframe
-          src={tiktokEmbed}
-          className="h-full w-full border-0"
-          allow="autoplay; encrypted-media"
-          allowFullScreen
-        />
+        <div className="relative h-full w-full">
+          <iframe
+            src={tiktokEmbed}
+            className="h-full w-full border-0"
+            allow="autoplay; encrypted-media"
+            allowFullScreen
+          />
+          {/* Tıklamaları engelle */}
+          <div className="absolute inset-0 z-10" />
+        </div>
       ) : car.video_url ? (
         <video
           ref={videoRef}
