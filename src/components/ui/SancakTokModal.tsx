@@ -143,6 +143,37 @@ export default function SancakTokModal({ open, onClose, cars, initialIndex = 0 }
     return () => window.removeEventListener("keydown", h);
   }, [open, onClose, go]);
 
+  // TikTok video bitince sonraki araca geç
+  const currentCar = cars[Math.max(0, Math.min(idx, cars.length - 1))];
+  const isTikTok = !!(currentCar?.video_url && currentCar.video_url.includes("tiktok.com"));
+
+  useEffect(() => {
+    if (!open || !isTikTok) return;
+
+    // TikTok embed postMessage dinle
+    const onMsg = (e: MessageEvent) => {
+      try {
+        const data = typeof e.data === "string" ? JSON.parse(e.data) : e.data;
+        if (
+          data?.type === "onStateChange" && data?.value === "ended" ||
+          data?.type === "VIDEO_END" ||
+          data?.event === "ended"
+        ) {
+          go("up");
+        }
+      } catch {}
+    };
+    window.addEventListener("message", onMsg);
+
+    // Fallback: 60sn sonra otomatik geç
+    const timer = setTimeout(() => go("up"), 60_000);
+
+    return () => {
+      window.removeEventListener("message", onMsg);
+      clearTimeout(timer);
+    };
+  }, [open, isTikTok, idx, go]);
+
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
     go(e.deltaY > 0 ? "up" : "down");
