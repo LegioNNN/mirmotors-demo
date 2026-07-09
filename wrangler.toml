@@ -1,4 +1,4 @@
-name = "mirmotors"
+name = "mirmotors-demo"
 compatibility_date = "2026-07-09"
 compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
 main = ".open-next/worker.js"
