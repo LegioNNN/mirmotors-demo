@@ -55,7 +55,7 @@ function isTikTokUrl(url: string) {
 
 function getTikTokEmbedUrl(url: string) {
   const match = url.match(/\/video\/(\d+)/);
-  if (match) return `https://www.tiktok.com/embed/v2/${match[1]}`;
+  if (match) return `https://www.tiktok.com/embed/v2/${match[1]}?autoplay=1&muted=0`;
   return null;
 }
 
