@@ -756,12 +756,40 @@ export default function Home() {
       {/* GaleriTok FAB */}
       {!loading && (
         <div className="fixed bottom-20 right-4 z-40 lg:bottom-8 lg:right-6">
+          <style>{`
+            @keyframes tok-float-0 { 0%{transform:translate(0,0) scale(1);opacity:.9} 100%{transform:translate(-22px,-48px) scale(.6);opacity:0} }
+            @keyframes tok-float-1 { 0%{transform:translate(0,0) scale(1);opacity:.9} 100%{transform:translate(18px,-52px) scale(.5);opacity:0} }
+            @keyframes tok-float-2 { 0%{transform:translate(0,0) scale(1);opacity:.85} 100%{transform:translate(-30px,-40px) scale(.65);opacity:0} }
+            @keyframes tok-float-3 { 0%{transform:translate(0,0) scale(1);opacity:.9} 100%{transform:translate(26px,-44px) scale(.55);opacity:0} }
+            @keyframes tok-float-4 { 0%{transform:translate(0,0) scale(1);opacity:.8} 100%{transform:translate(-10px,-56px) scale(.5);opacity:0} }
+            @keyframes tok-float-5 { 0%{transform:translate(0,0) scale(1);opacity:.9} 100%{transform:translate(32px,-38px) scale(.6);opacity:0} }
+            .tok-p0{position:absolute;bottom:52px;left:50%;animation:tok-float-0 2.2s ease-out infinite;animation-delay:0s;}
+            .tok-p1{position:absolute;bottom:52px;left:50%;animation:tok-float-1 2.4s ease-out infinite;animation-delay:.4s;}
+            .tok-p2{position:absolute;bottom:52px;left:50%;animation:tok-float-2 2.1s ease-out infinite;animation-delay:.8s;}
+            .tok-p3{position:absolute;bottom:52px;left:50%;animation:tok-float-3 2.5s ease-out infinite;animation-delay:1.2s;}
+            .tok-p4{position:absolute;bottom:52px;left:50%;animation:tok-float-4 2.3s ease-out infinite;animation-delay:1.7s;}
+            .tok-p5{position:absolute;bottom:52px;left:50%;animation:tok-float-5 2.6s ease-out infinite;animation-delay:.2s;}
+          `}</style>
           <button
             type="button"
             onClick={() => openTok(0)}
             aria-label={`${brand.tok.letter}${brand.tok.label}`}
             className="relative flex flex-col items-center gap-1 active:scale-95 transition-transform"
           >
+            {/* Floating particles */}
+            <span className="tok-p0 text-base select-none pointer-events-none">❤️</span>
+            <span className="tok-p1 select-none pointer-events-none" style={{fontSize:13}}>
+              <svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M1 1L1 12L4 9.5L5.5 13.5L7 13L5.5 9L9 9L1 1Z" fill="white" stroke="#ff0050" strokeWidth="1"/></svg>
+            </span>
+            <span className="tok-p2 text-sm select-none pointer-events-none">🤍</span>
+            <span className="tok-p3 select-none pointer-events-none" style={{fontSize:12}}>
+              <svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M1 1L1 12L4 9.5L5.5 13.5L7 13L5.5 9L9 9L1 1Z" fill="#00f2ea" stroke="#00f2ea" strokeWidth="1"/></svg>
+            </span>
+            <span className="tok-p4 text-base select-none pointer-events-none">❤️</span>
+            <span className="tok-p5 select-none pointer-events-none" style={{fontSize:13}}>
+              <svg width="13" height="16" viewBox="0 0 13 16" fill="none"><path d="M1 1L1 12L4 9.5L5.5 13.5L7 13L5.5 9L9 9L1 1Z" fill="white" stroke="#ff0050" strokeWidth="1"/></svg>
+            </span>
+
             <span
               className="relative flex h-14 w-14 items-center justify-center rounded-2xl shadow-xl"
               style={{ background: "linear-gradient(135deg, #010101 0%, #1a1a2e 100%)" }}
