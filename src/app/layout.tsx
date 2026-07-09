@@ -48,6 +48,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="tr">
+      <head>
+        <link rel="apple-touch-startup-image" href="/bg.png" />
+      </head>
       <body className={`${inter.className} overflow-x-hidden bg-[#f9fafb] text-[#111827] antialiased`}>
         {children}
         <PwaInstaller />
