@@ -6,3 +6,8 @@ main = ".open-next/worker.js"
 [assets]
 directory = ".open-next/assets"
 binding = "ASSETS"
+
+[vars]
+NEXT_PUBLIC_SUPABASE_URL = "https://zurhpytymwevhrclnszy.supabase.co"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_ukM_v4dwKRX8rW4zdzod_g_4n6FUz04"
+NEXT_PUBLIC_R2_PUBLIC_URL = "https://pub-e53315595121404b9b449c7abcb5fe7c.r2.dev"
