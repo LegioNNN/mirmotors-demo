@@ -49,6 +49,16 @@ function PhotoGrid({ car }: { car: Car }) {
   );
 }
 
+function isTikTokUrl(url: string) {
+  return url.includes("tiktok.com");
+}
+
+function getTikTokEmbedUrl(url: string) {
+  const match = url.match(/\/video\/(\d+)/);
+  if (match) return `https://www.tiktok.com/embed/v2/${match[1]}`;
+  return null;
+}
+
 /* ─── Tek araç kartı ─── */
 function CarSlide({ car, active }: { car: Car; active: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -59,9 +69,20 @@ function CarSlide({ car, active }: { car: Car; active: boolean }) {
     else { videoRef.current.pause(); videoRef.current.currentTime = 0; }
   }, [active]);
 
+  const tiktokEmbed = car.video_url && isTikTokUrl(car.video_url)
+    ? getTikTokEmbedUrl(car.video_url)
+    : null;
+
   return (
     <div className="absolute inset-0">
-      {car.video_url ? (
+      {tiktokEmbed ? (
+        <iframe
+          src={tiktokEmbed}
+          className="h-full w-full border-0"
+          allow="autoplay; encrypted-media"
+          allowFullScreen
+        />
+      ) : car.video_url ? (
         <video
           ref={videoRef}
           src={car.video_url}

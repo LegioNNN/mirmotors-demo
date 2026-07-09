@@ -53,7 +53,7 @@ export default function PwaInstaller() {
   if (!show || installed) return null;
 
   return (
-    <div className="fixed bottom-24 left-4 right-4 z-[200] sm:left-auto sm:right-4 sm:w-80 animate-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed bottom-24 left-4 right-4 z-[200] sm:right-auto sm:left-4 sm:w-80 animate-in slide-in-from-bottom-4 duration-300">
       <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-2xl shadow-black/10">
         <div className="flex items-start gap-3">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#111827]">

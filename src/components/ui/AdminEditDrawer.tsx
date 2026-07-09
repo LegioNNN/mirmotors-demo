@@ -270,13 +270,13 @@ function VideoUploadField({
 
   return (
     <div>
-      <label className={labelCls}>Video (MP4)</label>
+      <label className={labelCls}>Video (MP4 veya TikTok URL)</label>
       {/* Mevcut URL satırı */}
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="https://... veya aşağıdan yükle"
+        placeholder="https://www.tiktok.com/@.../video/... veya MP4 URL"
         className={inputCls}
       />
       {/* Upload butonu */}
