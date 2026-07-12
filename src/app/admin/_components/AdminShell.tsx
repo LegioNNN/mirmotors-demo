@@ -93,14 +93,11 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
     <div className="flex min-h-screen bg-[#f4f5f7]">
 
       {/* ── Sidebar (desktop) ── */}
-      <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-gray-200 bg-white">
+      <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-white/5 bg-[#0d1117]">
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
-          <img src={brand.logos.icon} alt={brand.name} className="h-10 w-10 object-contain" />
-          <div>
-            <p className="text-sm font-bold text-gray-900">{brand.shortName} Motors</p>
-            <p className="text-[9px] font-semibold uppercase tracking-widest text-gray-400">Admin Panel</p>
-          </div>
+        <div className="flex flex-col items-center gap-1 px-5 py-5 border-b border-white/5">
+          <img src={brand.logos.horizontalDark} alt={brand.name} className="h-9 w-auto" />
+          <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-amber-400/70">Yönetim Paneli</p>
         </div>
 
         {/* Nav */}
@@ -114,14 +111,14 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
                 onClick={() => setActiveTab(item.key)}
                 className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                   active
-                    ? "bg-[#111827] text-white"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                    : "text-gray-400 hover:bg-white/5 hover:text-gray-200"
                 }`}
               >
-                <span className={active ? "text-white" : "text-gray-400"}>{item.icon}</span>
+                <span className={active ? "text-amber-400" : "text-gray-500"}>{item.icon}</span>
                 {item.label}
                 {item.key === "talepler" && pendingCount > 0 && (
-                  <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold ${active ? "bg-white/20 text-white" : "bg-red-100 text-red-600"}`}>
+                  <span className={`ml-auto rounded-full px-1.5 py-0.5 text-[10px] font-bold ${active ? "bg-amber-500/20 text-amber-300" : "bg-red-500/20 text-red-400"}`}>
                     {pendingCount}
                   </span>
                 )}
@@ -131,12 +128,12 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
         </nav>
 
         {/* Alt butonlar */}
-        <div className="border-t border-gray-100 px-3 py-3 space-y-1">
+        <div className="border-t border-white/5 px-3 py-3 space-y-1">
           <a
             href="/"
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-white/5 hover:text-gray-300 transition-colors"
           >
-            <svg className="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <polyline points="15 18 9 12 15 6" />
             </svg>
             Vitrine Dön
@@ -144,7 +141,7 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
           <button
             type="button"
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400/70 hover:bg-red-500/10 hover:text-red-400 transition-colors"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -160,14 +157,11 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-56 bg-white shadow-xl flex flex-col">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-              <div className="flex items-center gap-2">
-                <img src={brand.logos.icon} alt={brand.name} className="h-9 w-9 object-contain" />
-                <span className="text-sm font-bold text-gray-900">{brand.shortName} Motors</span>
-              </div>
-              <button type="button" onClick={() => setSidebarOpen(false)} className="rounded-lg p-1 hover:bg-gray-100">
-                <svg className="h-4 w-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+          <aside className="absolute left-0 top-0 bottom-0 w-56 bg-[#0d1117] shadow-2xl flex flex-col border-r border-white/5">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
+              <img src={brand.logos.horizontalDark} alt={brand.name} className="h-8 w-auto" />
+              <button type="button" onClick={() => setSidebarOpen(false)} className="rounded-lg p-1 hover:bg-white/10">
+                <svg className="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
               </button>
@@ -181,21 +175,21 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
                     type="button"
                     onClick={() => { setActiveTab(item.key); setSidebarOpen(false); }}
                     className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
-                      active ? "bg-[#111827] text-white" : "text-gray-600 hover:bg-gray-100"
+                      active ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" : "text-gray-400 hover:bg-white/5 hover:text-gray-200"
                     }`}
                   >
-                    <span className={active ? "text-white" : "text-gray-400"}>{item.icon}</span>
+                    <span className={active ? "text-amber-400" : "text-gray-500"}>{item.icon}</span>
                     {item.label}
                   </button>
                 );
               })}
             </nav>
-            <div className="border-t border-gray-100 px-3 py-3 space-y-1">
-              <a href="/" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100">
-                <svg className="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="15 18 9 12 15 6" /></svg>
+            <div className="border-t border-white/5 px-3 py-3 space-y-1">
+              <a href="/" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-500 hover:bg-white/5 hover:text-gray-300">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><polyline points="15 18 9 12 15 6" /></svg>
                 Vitrine Dön
               </a>
-              <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50">
+              <button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-400/70 hover:bg-red-500/10 hover:text-red-400">
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
                 </svg>
