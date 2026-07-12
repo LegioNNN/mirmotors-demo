@@ -315,19 +315,37 @@ export default function AdminLeadPanel({ leads, onStatusChange, onNoteChange, on
     <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
 
       {/* ── Header ── */}
-      <div className="flex items-center justify-between border-b border-gray-100 bg-[#f8f9fb] px-5 py-4 sm:px-6">
-        <div>
-          <h2 className="text-base font-black text-[#111827]">Araç Alım Talepleri</h2>
-          <p className="mt-0.5 text-[11px] text-gray-400">
-            {leads.length} toplam · {countByStatus["Bekliyor"]} bekliyor
-            {countByStatus["Tekrar Aranacak"] > 0 && ` · ${countByStatus["Tekrar Aranacak"]} tekrar dönüş`}
-          </p>
+      <div className="border-b border-gray-100 bg-[#f8f9fb] px-5 py-4 sm:px-6">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h2 className="text-base font-black text-[#111827]">Araç Alım Talepleri</h2>
+            <p className="mt-0.5 text-[11px] text-gray-400">{leads.length} toplam talep</p>
+          </div>
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#111827] shadow-sm">
+            <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </div>
         </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#111827] shadow-sm">
-          <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8}>
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
+        {/* Stat kartları */}
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-amber-500">Yanıt Bekliyor</p>
+            <p className="mt-0.5 text-2xl font-black text-amber-600">{countByStatus["Bekliyor"]}</p>
+          </div>
+          <div className="rounded-xl border border-purple-200 bg-purple-50 px-3 py-2.5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-purple-500">Tekrar Dönüş</p>
+            <p className="mt-0.5 text-2xl font-black text-purple-600">{countByStatus["Tekrar Aranacak"]}</p>
+          </div>
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">Kabul Edildi</p>
+            <p className="mt-0.5 text-2xl font-black text-emerald-600">{countByStatus["Kabul Edildi"] + countByStatus["Alım Yapıldı"]}</p>
+          </div>
+          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2.5">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Tüm Talepler</p>
+            <p className="mt-0.5 text-2xl font-black text-[#111827]">{leads.length}</p>
+          </div>
         </div>
       </div>
 

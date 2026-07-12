@@ -163,7 +163,7 @@ export default function AdminDashboard({
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
-          Lead&apos;lere Bak
+          Araç Alım Taleplerine Bak
           {pendingCount > 0 && (
             <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-black text-white">{pendingCount}</span>
           )}
