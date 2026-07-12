@@ -8,6 +8,7 @@ import { createKaporaLink } from "@/utils/whatsappBalancer";
 import { getCarImage } from "@/utils/carImages";
 import { trackWhatsappClick } from "@/utils/trackWhatsappClick";
 import { brand } from "@/config/brand";
+import ShareButton from "@/components/ui/ShareButton";
 
 /* -------------------------------------------------------------------------- */
 /*  Segment config                                                             */
@@ -231,6 +232,7 @@ export default function CarCard({ car }: CarCardProps) {
               </svg>
               <span className="hidden sm:inline">WA</span>
             </button>
+            <ShareButton url={`/ilan/${car.id}`} title={`${car.brand} ${car.model} ${car.year} — ${new Intl.NumberFormat("tr-TR").format(car.price)} TL`} variant="icon" />
           </div>
         ) : (
           <div className="mt-2.5 rounded-lg bg-gray-50 border border-gray-100 py-2 text-center text-[11px] font-semibold text-gray-400">

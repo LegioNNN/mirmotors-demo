@@ -2,10 +2,13 @@
 /*  CarDetailSidebar - Sag panel: fiyat, spec, WhatsApp, esnaf notu         */
 /* ======================================================================== */
 
+"use client";
+
 import type { Car } from "@/types";
 import { formatPrice, formatKm } from "@/utils/detailFormatters";
 import { brand } from "@/config/brand";
 import React from "react";
+import ShareButton from "@/components/ui/ShareButton";
 
 interface Props {
   car: Car;
@@ -192,6 +195,10 @@ export default function CarDetailSidebar({ car, onWpClick, wpLoading }: Props) {
             {wpLoading ? "Yükleniyor..." : "Benzer Araç Sor"}
           </button>
         )}
+
+        <div className="mt-2">
+          <ShareButton url={`/ilan/${car.id}`} title={`${car.brand} ${car.model} ${car.year} — ${formatPrice(car.price)} TL`} variant="full" />
+        </div>
 
         {/* Guven rozetleri */}
         <div className="mt-4 flex flex-wrap gap-2">
