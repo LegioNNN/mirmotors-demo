@@ -97,7 +97,7 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
       <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-white/5 bg-[#0d1117]">
         {/* Logo */}
         <div className="flex flex-col items-center gap-1 px-5 py-5 border-b border-white/5">
-          <img src={brand.logos.horizontalDark} alt={brand.name} className="h-9 w-auto" />
+          <img src={brand.logos.horizontalDark} alt={brand.name} className="h-14 w-auto" />
           <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-amber-400/70">Yönetim Paneli</p>
         </div>
 
