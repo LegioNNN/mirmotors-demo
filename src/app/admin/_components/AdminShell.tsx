@@ -235,7 +235,7 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
                 </span>
-                {pendingCount} bekliyor
+                {pendingCount} araç alım talebi yanıt bekliyor
               </button>
             )}
           </div>
