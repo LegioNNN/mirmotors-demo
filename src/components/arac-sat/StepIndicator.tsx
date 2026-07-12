@@ -35,9 +35,9 @@ export default function StepIndicator({ adim }: StepIndicatorProps) {
               <div
                 className={`relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all duration-300 sm:h-10 sm:w-10 sm:text-sm ${
                   tamamlandi
-                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
+                    ? "bg-amber-600 text-white shadow-md shadow-amber-600/30"
                     : aktif
-                      ? "bg-emerald-700 text-white ring-2 ring-emerald-400 ring-offset-2 shadow-lg shadow-emerald-700/30 scale-110"
+                      ? "bg-amber-700 text-white ring-2 ring-amber-400 ring-offset-2 shadow-lg shadow-amber-700/30 scale-110"
                       : "bg-gray-100 text-gray-400"
                 }`}
               >
@@ -57,7 +57,7 @@ export default function StepIndicator({ adim }: StepIndicatorProps) {
 
                 {/* Aktif adim icin nabiz efekti */}
                 {aktif && (
-                  <span className="absolute -inset-1 animate-ping rounded-full bg-emerald-400/30" />
+                  <span className="absolute -inset-1 animate-ping rounded-full bg-amber-400/30" />
                 )}
               </div>
 
@@ -65,9 +65,9 @@ export default function StepIndicator({ adim }: StepIndicatorProps) {
               <span
                 className={`truncate text-[9px] font-semibold uppercase tracking-wider transition-colors duration-200 sm:text-[10px] ${
                   tamamlandi
-                    ? "text-emerald-700"
+                    ? "text-amber-700"
                     : aktif
-                      ? "text-emerald-800"
+                      ? "text-amber-800"
                       : "text-gray-400"
                 }`}
               >
@@ -81,15 +81,15 @@ export default function StepIndicator({ adim }: StepIndicatorProps) {
               <div
                 className={`relative h-[3px] flex-1 mx-1 self-start mt-[18px] sm:mt-[19px] rounded-full transition-colors duration-300 ${
                   tamamlandi
-                    ? "bg-emerald-500"
+                    ? "bg-amber-500"
                     : aktif
-                      ? "bg-emerald-200"
+                      ? "bg-amber-200"
                       : "bg-gray-200"
                 }`}
               >
                 {/* Aktif adimda kismi dolu cizgi */}
                 {aktif && (
-                  <div className="absolute left-0 top-0 h-full w-1/2 rounded-full bg-emerald-500 transition-all duration-500" />
+                  <div className="absolute left-0 top-0 h-full w-1/2 rounded-full bg-amber-500 transition-all duration-500" />
                 )}
               </div>
             )}
