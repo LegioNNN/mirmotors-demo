@@ -328,24 +328,28 @@ export default function AdminLeadPanel({ leads, onStatusChange, onNoteChange, on
             </svg>
           </div>
         </div>
-        {/* Stat kartları */}
+        {/* Stat kartları — tıklanabilir filtre */}
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5">
+          <button type="button" onClick={() => { setStatusFilter(statusFilter === "Bekliyor" ? "Tümü" : "Bekliyor"); setSpecialFilter("Tümü"); onClearNotificationFilter?.(); }}
+            className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${statusFilter === "Bekliyor" ? "border-amber-400 bg-amber-100" : "border-amber-200 bg-amber-50 hover:bg-amber-100/70"}`}>
             <p className="text-[10px] font-bold uppercase tracking-wider text-amber-500">Yanıt Bekliyor</p>
             <p className="mt-0.5 text-2xl font-black text-amber-600">{countByStatus["Bekliyor"]}</p>
-          </div>
-          <div className="rounded-xl border border-purple-200 bg-purple-50 px-3 py-2.5">
+          </button>
+          <button type="button" onClick={() => { setStatusFilter(statusFilter === "Tekrar Aranacak" ? "Tümü" : "Tekrar Aranacak"); setSpecialFilter("Tümü"); onClearNotificationFilter?.(); }}
+            className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${statusFilter === "Tekrar Aranacak" ? "border-purple-400 bg-purple-100" : "border-purple-200 bg-purple-50 hover:bg-purple-100/70"}`}>
             <p className="text-[10px] font-bold uppercase tracking-wider text-purple-500">Tekrar Dönüş</p>
             <p className="mt-0.5 text-2xl font-black text-purple-600">{countByStatus["Tekrar Aranacak"]}</p>
-          </div>
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+          </button>
+          <button type="button" onClick={() => { setStatusFilter(statusFilter === "Kabul Edildi" ? "Tümü" : "Kabul Edildi"); setSpecialFilter("Tümü"); onClearNotificationFilter?.(); }}
+            className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${statusFilter === "Kabul Edildi" ? "border-emerald-400 bg-emerald-100" : "border-emerald-200 bg-emerald-50 hover:bg-emerald-100/70"}`}>
             <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-500">Kabul Edildi</p>
             <p className="mt-0.5 text-2xl font-black text-emerald-600">{countByStatus["Kabul Edildi"] + countByStatus["Alım Yapıldı"]}</p>
-          </div>
-          <div className="rounded-xl border border-gray-200 bg-white px-3 py-2.5">
+          </button>
+          <button type="button" onClick={() => { setStatusFilter("Tümü"); setSpecialFilter("Tümü"); onClearNotificationFilter?.(); }}
+            className={`rounded-xl border px-3 py-2.5 text-left transition-colors ${statusFilter === "Tümü" && specialFilter === "Tümü" ? "border-gray-400 bg-gray-100" : "border-gray-200 bg-white hover:bg-gray-50"}`}>
             <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Tüm Talepler</p>
             <p className="mt-0.5 text-2xl font-black text-[#111827]">{leads.length}</p>
-          </div>
+          </button>
         </div>
       </div>
 

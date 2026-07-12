@@ -5,7 +5,6 @@ import AdminDashboard from "@/components/ui/AdminDashboard";
 import AdminLeadPanel from "@/components/ui/AdminLeadPanel";
 import AdminVehiclePanel from "@/components/ui/AdminVehiclePanel";
 import AdminWAPanel from "@/components/ui/AdminWAPanel";
-import LeadNotificationBar from "@/components/ui/LeadNotificationBar";
 import { useAdminData } from "./useAdminData";
 import type { AdminTab } from "../types";
 import { brand } from "@/config/brand";
@@ -287,12 +286,6 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
               </div>
             ) : (
               <>
-                <LeadNotificationBar
-                  pendingCount={pendingCount}
-                  todayCount={todayCount}
-                  overdueCount={overdueCount}
-                  onFilterChange={(f) => setLeadFilter((prev) => (prev === f ? null : f))}
-                />
                 <AdminLeadPanel
                   leads={leads}
                   onStatusChange={handleLeadStatusChange}
