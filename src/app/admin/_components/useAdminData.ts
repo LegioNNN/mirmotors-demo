@@ -39,6 +39,8 @@ export function useAdminData(authenticated: boolean) {
   const [visitorsLoading, setVisitorsLoading] = useState(true);
   const [topViewedCars, setTopViewedCars] = useState<{ car_id: string; brand: string; model: string; year: number; count: number }[]>([]);
   const [topViewedLoading, setTopViewedLoading] = useState(true);
+  const [staleCarCount, setStaleCarCount] = useState<number>(0);
+  const [soldThisMonth, setSoldThisMonth] = useState<number>(0);
 
   /* --- Tarih yardımcıları --- */
   const getTodayTr = useCallback(() => {
@@ -272,6 +274,28 @@ export function useAdminData(authenticated: boolean) {
     });
   }, [authenticated]);
 
+  /* --- 30+ gündür satılmayan aktif araç --- */
+  useEffect(() => {
+    if (!authenticated) return;
+    const threshold = new Date();
+    threshold.setDate(threshold.getDate() - 30);
+    supabase.from("cars").select("*", { count: "exact", head: true })
+      .eq("status", "Aktif")
+      .lte("created_at", threshold.toISOString())
+      .then(({ count }) => { if (count !== null) setStaleCarCount(count); });
+  }, [authenticated]);
+
+  /* --- Bu ay satılan araç --- */
+  useEffect(() => {
+    if (!authenticated) return;
+    const monthStart = new Date();
+    monthStart.setDate(1); monthStart.setHours(0, 0, 0, 0);
+    supabase.from("cars").select("*", { count: "exact", head: true })
+      .eq("status", "Satıldı")
+      .gte("updated_at", monthStart.toISOString())
+      .then(({ count }) => { if (count !== null) setSoldThisMonth(count); });
+  }, [authenticated]);
+
   /* --- Haftalık & aylık ziyaretçi --- */
   useEffect(() => {
     if (!authenticated) return;
@@ -399,5 +423,7 @@ export function useAdminData(authenticated: boolean) {
     visitorsLoading,
     topViewedCars,
     topViewedLoading,
+    staleCarCount,
+    soldThisMonth,
   };
 }

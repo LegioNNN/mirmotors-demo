@@ -80,6 +80,7 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
     activeCarCount,
     weeklyVisitors, monthlyVisitors, visitorsLoading,
     topViewedCars, topViewedLoading,
+    staleCarCount, soldThisMonth,
   } = useAdminData(true);
 
   const handleLogout = () => {
@@ -265,6 +266,9 @@ export default function AdminShell({ onLogout }: AdminShellProps) {
               visitorsLoading={visitorsLoading}
               topViewedCars={topViewedCars}
               topViewedLoading={topViewedLoading}
+              staleCarCount={staleCarCount}
+              soldThisMonth={soldThisMonth}
+              onNavigate={setActiveTab}
             />
           )}
 

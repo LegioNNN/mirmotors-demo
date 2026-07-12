@@ -25,6 +25,9 @@ interface Props {
   visitorsLoading: boolean;
   topViewedCars: { car_id: string; brand: string; model: string; year: number; count: number }[];
   topViewedLoading: boolean;
+  staleCarCount: number;
+  soldThisMonth: number;
+  onNavigate: (tab: "dashboard" | "yonetim" | "talepler" | "wa") => void;
 }
 
 function MiniBar({ data, keyName, color, loading }: {
@@ -113,6 +116,7 @@ export default function AdminDashboard({
   sourceLabel, formatClickTime,
   weeklyVisitors, monthlyVisitors, visitorsLoading,
   topViewedCars, topViewedLoading,
+  staleCarCount, soldThisMonth, onNavigate,
 }: Props) {
   const [online, setOnline] = useState(0);
   const [todayV, setTodayV] = useState(0);
@@ -137,6 +141,46 @@ export default function AdminDashboard({
 
   return (
     <div className="space-y-4">
+
+      {/* ── Hızlı Eylemler ── */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => onNavigate("yonetim")}
+          className="flex items-center gap-2 rounded-xl bg-[#111827] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-gray-800 transition-colors"
+        >
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+          Yeni Araç Ekle
+        </button>
+        <button
+          type="button"
+          onClick={() => onNavigate("talepler")}
+          className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+        >
+          <svg className="h-4 w-4 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Lead&apos;lere Bak
+          {pendingCount > 0 && (
+            <span className="rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-black text-white">{pendingCount}</span>
+          )}
+        </button>
+        {staleCarCount > 0 && (
+          <button
+            type="button"
+            onClick={() => onNavigate("yonetim")}
+            className="flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-bold text-orange-700 shadow-sm hover:bg-orange-100 transition-colors"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {staleCarCount} araç 30+ gün bekliyor
+          </button>
+        )}
+      </div>
 
       {/* ── 4 Ana Stat Kartı ── */}
       <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -197,6 +241,24 @@ export default function AdminDashboard({
           <p className="mt-1 text-[11px] text-emerald-200">
             Bugün {liveLoading ? "—" : todayV} kişi araçlara baktı
           </p>
+        </div>
+      </div>
+
+      {/* ── İkincil Stat Kartları ── */}
+      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className={`rounded-xl border p-4 shadow-sm ${staleCarCount > 0 ? "border-orange-200 bg-orange-50" : "border-gray-200 bg-white"}`}>
+          <p className={`text-[11px] font-bold uppercase tracking-wider ${staleCarCount > 0 ? "text-orange-600" : "text-gray-400"}`}>
+            30+ Gündür Bekleyen Araç
+          </p>
+          <p className={`mt-2 text-3xl font-black ${staleCarCount > 0 ? "text-orange-700" : "text-[#111827]"}`}>{staleCarCount}</p>
+          <p className={`mt-1 text-[11px] ${staleCarCount > 0 ? "font-semibold text-orange-600" : "text-gray-400"}`}>
+            {staleCarCount > 0 ? "Fiyat güncellemesi gerekebilir" : "Tüm araçlar taze"}
+          </p>
+        </div>
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Bu Ay Satılan</p>
+          <p className="mt-2 text-3xl font-black text-emerald-700">{soldThisMonth}</p>
+          <p className="mt-1 text-[11px] text-emerald-600">Araç satışa kapandı</p>
         </div>
       </div>
 
